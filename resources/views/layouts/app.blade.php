@@ -18,6 +18,7 @@
         @endisset
         @yield('content') 
     </div>
+    @include('components.footer')
     @livewireScripts
 </body>
 </html>

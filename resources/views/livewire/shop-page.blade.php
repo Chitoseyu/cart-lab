@@ -1,6 +1,6 @@
 @section('title', '商品清單')
 
-<div class="container mt-5">
+<div class="container mt-5" style="min-height:80vh;">
     <div class="row">
         <div class="col-md-6">
             <h2>商品列表</h2>

@@ -3,7 +3,7 @@
 @section('title', '首頁')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="container mt-5" style="min-height:80vh;">
         <div class="jumbotron text-center">
             <h1 class="display-4">歡迎來到我們的購物網站！</h1>
             <img src="{{ asset('images/net_shop.png') }}" class="img-fluid mb-4" style="max-width: 50%;" alt="網路購物">

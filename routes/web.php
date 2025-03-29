@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\UserController;
 use App\Livewire\ShopPage;
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'shopcart'], function () {
     Route::post('/login', [UserController::class, 'login'])->name('shopcart.login');
+    Route::get('/login', [UserController::class, 'login_page'])->name('shopcart.login_page');
 
 });
 Route::get('/shop',ShopPage::class);
