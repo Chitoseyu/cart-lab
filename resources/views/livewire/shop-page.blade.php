@@ -48,9 +48,14 @@
                 </ul>
                 <button wire:click="checkout" class="btn btn-success mt-3">前往結帳</button>
             @else
-                <p class="text-muted">購物車內沒有商品</p>
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    <div>
+                        購物車內沒有商品
+                    </div>
+                </div>
             @endif
         </div>
-        </div>
+        
     </div>
 </div>

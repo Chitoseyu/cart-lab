@@ -14,8 +14,7 @@ class ShopPage extends Component
 
     public function mount(){
         $this->items = Item::get();
-        $order = Order::create(['user_id'=>1]);
-        session(['order'=>$order]);
+        session(['cart'=>['items' => []]]);
     }
 
     public function render()
@@ -75,7 +74,6 @@ class ShopPage extends Component
     {
         // 取得 session 訂單
         $orderData = session()->get('cart');
-        // dd($orderData);
 
         if (!$orderData || empty($orderData['items'])) {
             return; // 若無商品，則不處理
@@ -83,7 +81,7 @@ class ShopPage extends Component
 
         // 建立新訂單
         $order = Order::create([
-            // 'user_id' => auth()->id(), // 假設需要關聯用戶
+            // 'user_id' => auth()->id(),
             'user_id' => 1,
         ]);
 
@@ -94,7 +92,7 @@ class ShopPage extends Component
 
         // 清除 session，防止重複下單
         session()->forget('cart');
-
-        return redirect()->route('page.orders.payok'); // 假設有結帳成功頁面
+        
+        return redirect()->route('page.orders.payok');
     }
 }
