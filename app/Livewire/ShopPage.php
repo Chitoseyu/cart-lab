@@ -4,27 +4,24 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Log;
-use App\Models\Order;
 use App\Models\Item;
 
 class ShopPage extends Component
 {
     public $items;
-    public Order $order;
+    
 
     public function mount(){
         $this->items = Item::get();
-        session(['cart'=>['items' => []]]);
+        $cart = session('cart', ['items' => []]);
+        session(['cart' => $cart]);
     }
 
     public function render()
     {
         return view('livewire.shop-page')->layout('layouts.app');
     }
-    public function payOk()
-    {
-        return view('page.orders.payok');
-    }
+    // 新增至購物車
     public function addCart($id)
     {
         $orders = session()->get('cart', ['items' => []]);
@@ -33,66 +30,48 @@ class ShopPage extends Component
         $item = Item::findOrFail($id);
 
         // 檢查商品是否已在購物車中
-        if (isset($orders['items'][$id])) {
-            // 若商品已存在，數量 +1
-            $orders['items'][$id]['qty'] += 1;
-        } else {
+        if (!isset($orders['items'][$id])) {
             // 若商品不存在，新增
             $orders['items'][$id] = [
                 'id' => $item->id,
                 'title' => $item->title,
                 'price' => $item->price,
+                'pic' => $item->pic,
                 'qty' => 1,
             ];
         }
-        // 存回 session
         session()->put('cart', $orders);
+
+        // 計算所有商品的數量總和
+        $totalQty = 0;
+        if(!empty($orders['items'])){
+            $totalQty = count($orders['items']);
+        }
+        $this->dispatch('cartTotalUpdated',  $totalQty);
+        // 發出加入提示事件
+        $this->dispatch('itemAddedToCart', '已加入購物車');
     }
-    // 新增：增加購物車中指定商品的數量
-    public function increaseCart($id)
+
+    // 從購物車移除
+    public function removeCart($id)
     {
         $orders = session()->get('cart', ['items' => []]);
+
+        // 檢查商品是否在購物車中
         if (isset($orders['items'][$id])) {
-            $orders['items'][$id]['qty'] += 1;
+            // 從購物車移除商品
+            unset($orders['items'][$id]);
         }
         session()->put('cart', $orders);
-    }
 
-    // 新增：減少購物車中指定商品的數量，若數量為 0 則移除該商品
-    public function decreaseCart($id)
-    {
-        $orders = session()->get('cart', ['items' => []]);
-        if (isset($orders['items'][$id])) {
-            $orders['items'][$id]['qty'] -= 1;
-            if ($orders['items'][$id]['qty'] < 1) {
-                unset($orders['items'][$id]);
-            }
+        // 計算所有商品的數量總和
+        $totalQty = 0;
+        if(!empty($orders['items'])){
+            $totalQty = count($orders['items']);
         }
-        session()->put('cart', $orders);
+        $this->dispatch('cartTotalUpdated',  $totalQty);
+        // 發出移除提示事件
+        $this->dispatch('itemRemovedFromCart', '已從購物車移除');
     }
-    public function checkout()
-    {
-        // 取得 session 訂單
-        $orderData = session()->get('cart');
-
-        if (!$orderData || empty($orderData['items'])) {
-            return; // 若無商品，則不處理
-        }
-
-        // 建立新訂單
-        $order = Order::create([
-            // 'user_id' => auth()->id(),
-            'user_id' => 1,
-        ]);
-
-        // 插入訂單商品
-        foreach ($orderData['items'] as $item) {
-            $order->items()->attach($item['id'], ['qty' => $item['qty']]);
-        }
-
-        // 清除 session，防止重複下單
-        session()->forget('cart');
-        
-        return redirect()->route('page.orders.payok');
-    }
+   
 }

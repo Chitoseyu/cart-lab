@@ -8,54 +8,80 @@
                 @foreach($items as $item)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ url('images/product/'. $item->pic) }}" width="50" height="50" class="me-3" alt="{{ $item->title }}">
-                            <span>{{ $item->title }} (${{ $item->price }})</span>
+                            <img src="{{ url('images/product/'. $item->pic) }}" width="80" height="80" class="me-3" alt="{{ $item->title }}">
+                            <div>
+                                <h6 class="mb-1">{{ $item->title }}</h6>
+                                <small class="text-muted">單價: ${{ $item->price }}</small>
+                            </div>
                         </div>
                         <div>
-                            <a href="#" wire:click="addCart({{$item->id}})" class="btn btn-primary btn-sm">購買</a>
+                            @if(session()->has('cart.items.' . $item->id))
+                                <button wire:click="removeCart({{ $item->id }})" class="btn btn-outline-danger btn-sm">移除</button>
+                            @endif
+                            <button wire:click="addCart({{ $item->id }})" class="btn btn-outline-primary btn-sm">加入</button>
                         </div>
                     </li>
                 @endforeach
             </ul>
         </div>
-        <div class="col-md-6">
-            <h2>訂單明細</h2>
-            @php
-                $cart = session('cart', ['items' => []]); // 取得 session 購物車
-            @endphp
-
-            @if(!empty($cart['items']))
-                <ul class="list-group">
-                    @foreach($cart['items'] as $item)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <span>{{ $item['title'] }} (${{ $item['price'] }})</span>
-                                <div class="mt-2">
-                                    <!-- 減少數量按鈕 -->
-                                    <button wire:click="decreaseCart({{ $item['id'] }})" class="btn btn-danger btn-sm">-</button>
-                                    <!-- 顯示目前數量 -->
-                                    <span class="mx-2">{{ $item['qty'] }}</span>
-                                    <!-- 增加數量按鈕 -->
-                                    <button wire:click="increaseCart({{ $item['id'] }})" class="btn btn-success btn-sm">+</button>
-                                </div>
-                            </div>
-                        </li>
-                    @endforeach
-                    <li class="list-group-item">
-                        <strong>總計:</strong> 
-                        ${{ collect($cart['items'])->sum(fn($item) => $item['price'] * $item['qty']) }}
-                    </li>
-                </ul>
-                <button wire:click="checkout" class="btn btn-success mt-3">前往結帳</button>
-            @else
-                <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <i class="fas fa-shopping-cart me-2"></i>
-                    <div>
-                        購物車內沒有商品
-                    </div>
-                </div>
-            @endif
+        <div id="toggle-cart" style="position: fixed; bottom: 20px; right: 20px; width: 80px; height: 60px; cursor: pointer; border: 2px solid #007bff; border-radius: 5px; background-color: white; z-index: 1001; display: flex; flex-direction: column; justify-content: center; align-items: center;"
+             onclick="window.location.href='{{ route('page.orders.cartlist') }}'">
+            <img src="{{ asset('images/shopping_cart.png') }}" style="width: 30px; height: 30px;">
+            <span style="font-size: 0.8em;">購物車</span>
+            <span id="cart-count" style="position: absolute; top: -10px; right: -10px; background-color: red; color: white; border-radius: 50%; padding: 5px; font-size: 0.8em; display: none; min-width: 20px; min-height: 20px; text-align: center; line-height: 20px; display: none;"></span>
         </div>
-        
+    </div>
+
+    <div id="flex-alert" class="alert alert-success" style="position: fixed; top: 3%; left: 50%; transform: translateX(-50%); display: none;">
+        <span id="flex-alert-message"></span>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+
+    function updateCartCount(totalQty) {
+        let cartCount = $("#cart-count");
+        if (totalQty > 0) {
+            cartCount.text(totalQty).css({
+                "display": "inline-block",
+                "visibility": "visible"
+            });
+        } else {
+            cartCount.hide();
+        }
+    }
+
+    // 更新購物車數量
+    Livewire.on('cartTotalUpdated', function(totalQty) {
+        setTimeout(() => updateCartCount(totalQty), 1);
+    });
+
+    // 確保 Livewire 更新後能正確選取購物車數量
+    document.addEventListener("livewire:load", function () {
+        Livewire.hook("message.processed", (message, component) => {
+            let totalQty = parseInt($("#cart-count").text()) || 0;
+            updateCartCount(totalQty);
+        });
+    });
+
+    // 顯示 FlexAlert 提示
+    function showFlexAlert(message) {
+        $("#flex-alert-message").text(message);
+        $("#flex-alert").fadeIn();
+        setTimeout(function() {
+            $("#flex-alert").fadeOut();
+        }, 3000); // 3 秒後自動消失
+    }
+
+    // 加入購物車提示
+    Livewire.on('itemAddedToCart', function(message) {
+        setTimeout(() =>  showFlexAlert(message), 1);
+    });
+
+    // 移除購物車提示
+    Livewire.on('itemRemovedFromCart', function(message) {
+        setTimeout(() =>  showFlexAlert(message), 1);
+    });
+});
+</script>

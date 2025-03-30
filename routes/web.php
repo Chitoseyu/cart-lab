@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Livewire\ShopPage;
+use App\Livewire\CartComponent;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,6 +24,11 @@ Route::group(['prefix' => 'shopcart'], function () {
     Route::get('/login', [UserController::class, 'login_page'])->name('shopcart.login_page');
 
 });
-Route::get('/shop',ShopPage::class);
 
-Route::get('/orders/payok', [ShopPage::class, 'payOk'])->name('page.orders.payok');
+
+Route::group(['prefix' => 'orders'], function () {
+    Route::get('/shop',ShopPage::class)->name('livewire.shop-page');
+    Route::get('/payok', [CartComponent::class, 'payOk'])->name('page.orders.payok');
+    Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('page.orders.cartlist');
+});
+
