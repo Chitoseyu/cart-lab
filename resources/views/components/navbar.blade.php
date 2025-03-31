@@ -18,7 +18,7 @@ $current_url = $_SERVER['REQUEST_URI'];
                     <a class="nav-link text-light <?php if ($current_url === '/') echo 'active text-dark'; ?>" aria-current="page" href="/">首頁</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-light <?php if ($current_url === '/orders/shop') echo 'active text-dark'; ?>" href="/orders/shop">商品列表</a>
+                    <a class="nav-link text-light <?php if ($current_url === '/product/list') echo 'active text-dark'; ?>" href="/product/list">商品列表</a>
                 </li>
             </ul>
             <a href="/shopcart/login" class="btn btn-outline-light">登入</a>

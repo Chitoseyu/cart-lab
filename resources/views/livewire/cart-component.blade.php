@@ -3,7 +3,14 @@
         $cart = session('cart', ['items' => []]);
     @endphp
 
-    <h2 class="mb-4">訂單明細</h2>
+     <!-- 麵包屑 -->
+     @include('components.breadcrumb', [
+        'breadcrumbs' => [
+            ['label' => '🏠', 'url' => url('/')],
+            ['label' => '商品列表', 'url' => url('/product/list')],
+            ['label' => '訂單明細', 'url' => ''],
+        ]
+    ])
 
     @if (!empty($cart['items']))
         <ul class="list-group mb-3">
@@ -32,7 +39,7 @@
             </li>
         </ul>
         <div class="d-flex justify-content-between">
-            <button onclick="window.location='{{ route('livewire.shop-page') }}'" class="btn btn-secondary">再逛逛</button>
+            <button onclick="window.location='{{ url('/product/list') }}'" class="btn btn-secondary">再逛逛</button>
             <button wire:click="checkout" class="btn btn-success">前往結帳</button>
         </div>
     @else
@@ -40,6 +47,6 @@
             <i class="fas fa-shopping-cart me-2"></i>
             <div>購物車內尚未加入商品</div>
         </div>
-        <button onclick="window.location='{{ route('livewire.shop-page') }}'" class="btn btn-secondary mt-3">再逛逛</button>
+        <button onclick="window.location='{{ url('/product/list') }}'" class="btn btn-secondary mt-3">再逛逛</button>
     @endif
 </div>

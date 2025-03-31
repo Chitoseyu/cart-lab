@@ -10,11 +10,11 @@
             <p class="lead">在這裡，您可以找到各種優質商品，享受愉快的購物體驗。</p>
             <hr class="my-4">
             <p>瀏覽我們的最新商品，或查看熱門商品推薦。</p>
-            <a class="btn btn-primary btn-lg" href="/orders/shop" role="button">開始購物</a>
+            <a class="btn btn-primary btn-lg" href="/product/list" role="button">開始購物</a>
         </div>
 
         <div class="mt-5 text-center">
-            <a href="/orders/shop" class="btn btn-secondary btn-lg">瀏覽所有商品</a>
+            <a href="/product/list" class="btn btn-secondary btn-lg">瀏覽所有商品</a>
         </div>
     </div>
 @endsection

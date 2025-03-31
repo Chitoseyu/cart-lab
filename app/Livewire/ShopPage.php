@@ -9,7 +9,6 @@ use App\Models\Item;
 class ShopPage extends Component
 {
     public $items;
-    
 
     public function mount(){
         $this->items = Item::get();
@@ -19,15 +18,18 @@ class ShopPage extends Component
 
     public function render()
     {
-        return view('livewire.shop-page')->layout('layouts.app');
+        return view('livewire.shop-page');
     }
     // 新增至購物車
     public function addCart($id)
     {
-        $orders = session()->get('cart', ['items' => []]);
+        $orders = session()->get('cart');
 
         // 查找商品
         $item = Item::findOrFail($id);
+
+        // 提示訊息
+        $info_msg = "";
 
         // 檢查商品是否已在購物車中
         if (!isset($orders['items'][$id])) {
@@ -39,6 +41,10 @@ class ShopPage extends Component
                 'pic' => $item->pic,
                 'qty' => 1,
             ];
+            $info_msg = $item->title . ' 已加入購物車！'; 
+        }
+        else{
+            $info_msg = $item->title . ' 已存在購物車！'; 
         }
         session()->put('cart', $orders);
 
@@ -48,20 +54,27 @@ class ShopPage extends Component
             $totalQty = count($orders['items']);
         }
         $this->dispatch('cartTotalUpdated',  $totalQty);
-        // 發出加入提示事件
-        $this->dispatch('itemAddedToCart', '已加入購物車');
+
+
+        // 發出提示事件
+        $this->dispatch('showFlexAlert', $info_msg);
     }
 
     // 從購物車移除
     public function removeCart($id)
     {
-        $orders = session()->get('cart', ['items' => []]);
+        $orders = session()->get('cart');
+
+        // 提示訊息
+        $info_msg = "";
 
         // 檢查商品是否在購物車中
         if (isset($orders['items'][$id])) {
+            $info_msg = $orders['items'][$id]['title'] . ' 已從購物車移除！';
             // 從購物車移除商品
             unset($orders['items'][$id]);
         }
+       
         session()->put('cart', $orders);
 
         // 計算所有商品的數量總和
@@ -70,8 +83,9 @@ class ShopPage extends Component
             $totalQty = count($orders['items']);
         }
         $this->dispatch('cartTotalUpdated',  $totalQty);
+
         // 發出移除提示事件
-        $this->dispatch('itemRemovedFromCart', '已從購物車移除');
+        $this->dispatch('showFlexAlert',  $info_msg);
     }
    
 }
