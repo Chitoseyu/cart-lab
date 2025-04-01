@@ -19,7 +19,10 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ url('images/product/'. $item['pic']) }}" width="80" height="80" class="me-3" alt="{{ $item['title'] }}">
                         <div>
-                            <h6 class="mb-1">{{ $item['title'] }}</h6>
+                            <a href="{{ url('product/detail/' . $item['id']) }}" class="btn btn-link p-0 text-decoration-none">
+                                <h6 class="mb-1">{{ $item['title'] }}</h6>
+                            </a>
+                            <br>
                             <small class="text-muted">單價: ${{ $item['price'] }}</small>
                         </div>
                     </div>

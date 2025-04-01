@@ -1,0 +1,52 @@
+/* 購物車按鈕 */
+.cart-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 80px;
+    height: 60px;
+    cursor: pointer;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    background-color: white;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 購物車圖示 */
+.cart-icon {
+    width: 30px;
+    height: 30px;
+}
+
+/* 購物車文字 */
+.cart-text {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #333;
+}
+
+/* 購物車數量標記 */
+.cartbadge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    min-width: 22px;
+    height: 22px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+

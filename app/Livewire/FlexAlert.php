@@ -9,16 +9,21 @@ class FlexAlert extends Component
     public $message;
     public $visible = false;
 
-    protected $listeners = ['showFlexAlert' => 'showMessage'];
+    protected $listeners = [
+        'showFlexAlert' => 'showMessage',
+    ];
 
-
+    public function mount()
+    {
+        //
+    }
+    
     public function showMessage($message)
     {
         $this->message = $message;
         $this->visible = true;
 
-        // 3 秒後自動隱藏
-        $this->dispatch('hideFlexAlert',$message);
+        $this->dispatch('hideFlexAlert', ['message' => $message]);
     }
 
 

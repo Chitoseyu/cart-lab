@@ -9,16 +9,13 @@
 <script>
 $(document).ready(function() {
 
-    function showFlexAlert(message) {
+    window.addEventListener('hideFlexAlert', event => {
+        let message = event.detail[0].message;
         $("#flex-alert-message").text(message);
         $("#flex-alert").fadeIn();
         setTimeout(function() {
             $("#flex-alert").fadeOut();
         }, 3000);
-    }
-
-    Livewire.on('hideFlexAlert', function(message) {
-        showFlexAlert(message);
     });
 
 });

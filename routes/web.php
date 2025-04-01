@@ -30,10 +30,23 @@ Route::group(['prefix' => 'product'], function () {
     Route::get('/list',[ItemController::class, 'list']);
     Route::get('/detail/{id}', [ItemController::class, 'detail']);
 
+
+    Route::get('/', [ItemController::class, 'index'])->name('items.index');
+    Route::get('/create', [ItemController::class, 'form'])->name('items.create');
+    Route::get('/edit/{id}', [ItemController::class, 'form'])->name('items.edit');
+    Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+    Route::put('/items/{id}', [ItemController::class, 'update'])->name('items.update');
+    Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy');
+
+   
+
 });
 
 Route::group(['prefix' => 'orders'], function () {
-    Route::get('/payok', [CartComponent::class, 'payOk'])->name('page.orders.payok');
-    Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('page.orders.cartlist');
+    Route::get('/payok', [CartComponent::class, 'payOk'])->name('orders.payok');
+    Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('orders.cartlist');
+
+    Route::post('/cartadd', [ItemController::class, 'addToCart'])->name('orders.cart.add');
+    Route::post('/checkout', [ItemController::class, 'directCheckout'])->name('orders.checkout');
 });
 

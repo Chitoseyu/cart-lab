@@ -31,7 +31,7 @@ class CartIcon extends Component
     }
     public function redirectToCart()
     {
-        return redirect()->route('page.orders.cartlist');
+        return redirect()->route('orders.cartlist');
     }
 
     public function render()

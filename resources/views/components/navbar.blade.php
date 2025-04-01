@@ -20,6 +20,10 @@ $current_url = $_SERVER['REQUEST_URI'];
                 <li class="nav-item">
                     <a class="nav-link text-light <?php if ($current_url === '/product/list') echo 'active text-dark'; ?>" href="/product/list">商品列表</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-light <?php if ($current_url === '/product') echo 'active text-dark'; ?>" href="/product">商品管理</a>
+                </li>
             </ul>
             <a href="/shopcart/login" class="btn btn-outline-light">登入</a>
         </div>

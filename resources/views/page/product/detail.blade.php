@@ -40,9 +40,21 @@
                 <p class="text-muted">{{ $product->desc }}</p>
             </div>
             <div class="d-flex justify-content-end gap-3">
-                <button class="btn btn-outline-primary btn-lg">加入購物車</button>
-                <button class="btn btn-outline-success btn-lg">立即購買</button>
+                <!-- 加入購物車 -->
+                <form action="{{ route('orders.cart.add') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <button type="submit" class="btn btn-outline-primary btn-lg">加入購物車</button>
+                </form>
+
+                <!-- 立即購買 -->
+                <form action="{{ route('orders.checkout') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <button type="submit" class="btn btn-outline-success btn-lg">立即購買</button>
+                </form>
             </div>
+
         </div>
     </div>
 

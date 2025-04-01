@@ -17,7 +17,7 @@ class CartComponent extends Component
     // 付款成功頁面
     public function payOk()
     {
-        return view('page.orders.payok');
+        return view('orders.payok');
     }
      // 新增：增加購物車中指定商品的數量
      public function increaseCart($id)
@@ -63,6 +63,6 @@ class CartComponent extends Component
          // 清除 session，防止重複下單
          session()->forget('cart');
          
-         return redirect()->route('page.orders.payok');
+         return redirect()->route('orders.payok');
      }
 }
