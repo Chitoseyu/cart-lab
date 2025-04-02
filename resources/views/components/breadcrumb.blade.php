@@ -34,7 +34,7 @@
             @foreach($breadcrumbs as $index => $breadcrumb)
                 @if ($index !== array_key_last($breadcrumbs))
                     <a href="{{ $breadcrumb['url'] }}" class="breadcrumb-item-link">{{ $breadcrumb['label'] }}</a>
-                    <img src="{{ asset('images/mark_arrow_right.svg') }}" class="breadcrumb-separator">
+                    <img src="{{ asset('storage/images/mark_arrow_right.svg') }}" class="breadcrumb-separator">
                 @else
                     <span class="breadcrumb-item-active">{{ $breadcrumb['label'] }}</span>
                 @endif

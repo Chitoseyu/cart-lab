@@ -25,4 +25,8 @@ php artisan key:generate
 php artisan migrate
 ```
 
+5.建立檔案連結位置(指向 storage/app/public 下的資料夾)
+```bash
+php artisan storage:link
+```
 

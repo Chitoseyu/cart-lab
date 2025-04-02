@@ -3,22 +3,20 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use Log;
 use App\Models\Item;
 
 class ShopPage extends Component
 {
-    public $items;
 
     public function mount(){
-        $this->items = Item::get();
         $cart = session('cart', ['items' => []]);
         session(['cart' => $cart]);
     }
 
     public function render()
     {
-        return view('livewire.shop-page');
+        $items = Item::where('enabled', 1)->get();
+        return view('livewire.shop-page',['items'=> $items]);
     }
     // 新增至購物車
     public function addCart($id)

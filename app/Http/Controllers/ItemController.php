@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Item;
 
 class ItemController extends Controller
@@ -91,20 +92,23 @@ class ItemController extends Controller
             $format_title = preg_replace('/[^a-zA-Z\p{Han}]+/u', '', $validated['title']); //只保留中英文
             $filename = $format_title . '-' . time() . '.' . $file->getClientOriginalExtension();
            
-            // 將檔案移到 public/images/product
-            $file->move(public_path('images/product'), $filename);
+            // 將檔案移到 storage/public/images/product
+            $file->storeAs('images/product', $filename, 'public');
             $validated['pic'] = $filename;
+        }
+        else{
+            $validated['pic'] = "no_image.png";
         }
 
         try {
             $item = Item::create($validated);
-            $message = ($item) ? '商品建立成功！' : '商品建立失敗，請稍後再試。';
+            $response = ($item) ? ['type'  => 'success','message' => '商品建立成功！']:['type'  => 'error','message' => '商品建立失敗，請稍後再試。'] ;
         } catch (\Exception $e) {
             //$e->getMessage()
-            $message = '商品建立時發生錯誤：';
+            $response = ['type'  => 'error','message' => '商品建立時發生錯誤'];
         }
  
-        return redirect()->route('items.index')->with('message', $message);
+        return redirect()->route('items.index')->with($response);
      }
 
     // 更新商品
@@ -120,31 +124,54 @@ class ItemController extends Controller
    
         $item = Item::findOrFail($id);
 
-        // 若有上傳新圖片處理上傳
+        // 若有上傳新圖片
         if ($request->hasFile('pic')) {
             $file = $request->file('pic');
             $format_title = preg_replace('/[^a-zA-Z\p{Han}]+/u', '', $validated['title']); //只保留中英文
             $filename = $format_title . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/product'), $filename);
+            // 將檔案移到 storage/public/images/product
+            $file->storeAs('images/product', $filename, 'public');
             $validated['pic'] = $filename;
-            // 刪除舊檔案的邏輯
+            // 刪除舊檔案
+            if ($item->pic && Storage::disk('public')->exists('images/product/' . $item->pic)) {
+                if($item->pic !== "no_image.png"){
+                    Storage::disk('public')->delete('images/product/' . $item->pic);
+                }  
+            }
         }
 
         $result = $item->update($validated);
 
-        $message = ($result) ? '商品更新成功！':'商品更新失敗！';
+        $response = ($result) ? ['type'  => 'success','message' => '商品更新成功！']:['type'  => 'success','message' => '商品更新失敗！'];
 
 
         
-        return redirect()->route('items.index')->with('message', $message);
+        return redirect()->route('items.index')->with($response);
     }
     public function destroy($id)
     {
         $item = Item::findOrFail($id);
-        // 刪除舊檔案的邏輯
-        $item->delete();
+        // 刪除檢查：圖片是否存在於 storage/public/images/product
+        if ($item->pic && Storage::disk('public')->exists('images/product/' . $item->pic)) {
+            if($item->pic !== "no_image.png"){
+                Storage::disk('public')->delete('images/product/' . $item->pic);
+            }   
+        }
+        try {
+            $item->delete();
+    
+            $response = [
+                'type'  => 'success',
+                'message' => '商品已刪除！'
+            ];
+        } catch (Exception $e) {
+            $response = [
+                'type'  => 'error',
+                'message' => '商品刪除失敗，請稍後再試！'
+            ];
+        }
 
-        return redirect()->route('items.index')->with('message', '商品已刪除！');
+        return redirect()->route('items.index')->with($response);
     }
 
 

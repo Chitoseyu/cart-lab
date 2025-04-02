@@ -17,7 +17,7 @@
     
         <!-- 左側商品圖片 -->
         <div class="col-md-6 d-flex justify-content-center align-items-center p-4">
-            <img src="{{ asset('images/product/' . $product->pic) }}" 
+            <img src="{{ asset('storage/images/product/' . $product->pic) }}" 
                 class="img-fluid rounded shadow" 
                 alt="{{ $product->title }}" 
                 style="max-width: 100%; max-height: 400px;">

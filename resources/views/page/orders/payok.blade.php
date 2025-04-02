@@ -7,7 +7,7 @@
     <div class="d-flex flex-column justify-content-center align-items-center" style="min-height:80vh;">
         <div class="jumbotron text-center">
             <h1 class="display-4">付款成功！</h1>
-            <img src="{{ asset('images/mark_ok.png') }}" class="img-fluid mb-4" style="max-width: 50%;" alt="付款成功">
+            <img src="{{ asset('storage/images/mark_ok.png') }}" class="img-fluid mb-4" style="max-width: 50%;" alt="付款成功">
             <p class="lead">感謝您的購買，您的訂單已成功付款。</p>
             <hr class="my-4">
 

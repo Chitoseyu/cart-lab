@@ -10,7 +10,7 @@
                 <div class="card shadow">
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
-                            <img src="{{ asset('images/home.png') }}" class="img-fluid" style="max-width: 300px;" alt="系統圖像">
+                            <img src="{{ asset('storage/images/home.png') }}" class="img-fluid" style="max-width: 300px;" alt="系統圖像">
                         </div>
                         <h3 class="card-title text-center mb-4">登入</h3>
                         <div class="mb-3">

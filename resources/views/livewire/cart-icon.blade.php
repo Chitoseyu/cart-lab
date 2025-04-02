@@ -1,7 +1,7 @@
 <div id="toggle-cart"
      style="position: fixed; bottom: 20px; right: 20px; width: 80px; height: 60px; cursor: pointer; border: 2px solid #007bff; border-radius: 10px; background-color: white; z-index: 1001; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);"
      wire:click="redirectToCart">
-    <img src="{{ asset('images/shopping_cart.png') }}" style="width: 30px; height: 30px;">
+    <img src="{{ asset('storage/images/shopping_cart.png') }}" style="width: 30px; height: 30px;">
     <span style="font-size: 0.8em; font-weight: 600; color: #333;">購物車</span>
 
     @if ($cartTotal > 0)
