@@ -1,6 +1,6 @@
 <div class="col-md-6">
     <ul class="list-group">
-        @if ($items)
+        @if ($items->isNotEmpty())
             @foreach ($items as $item)
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
@@ -20,8 +20,14 @@
                     </div>
                 </li>
             @endforeach
+            <!-- 分頁按鈕 -->
+            @if ($items->hasPages())
+            <li wire:ignore class="list-group-item d-flex justify-content-center mt-1">
+                {{ $items->links('vendor.pagination.bootstrap-4') }}
+            </li>
+            @endif
         @else
-            <p>沒有找到商品。</p>
+            <p class="text-muted text-center">沒有找到符合條件的商品。</p>
         @endif
     </ul>
 </div>

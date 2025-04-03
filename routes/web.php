@@ -27,8 +27,8 @@ Route::group(['prefix' => 'shopcart'], function () {
 });
 Route::group(['prefix' => 'product'], function () {
     
-    Route::get('/list',[ItemController::class, 'list']);
-    Route::get('/detail/{id}', [ItemController::class, 'detail']);
+    Route::get('/list',[ItemController::class, 'list'])->name('product.list');
+    Route::get('/detail/{id}', [ItemController::class, 'detail'])->name('product.detail');
 
 
     Route::get('/', [ItemController::class, 'index'])->name('items.index');

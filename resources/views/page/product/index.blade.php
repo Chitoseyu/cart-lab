@@ -11,19 +11,47 @@
             ['label' => '商品管理', 'url' => ''],
         ]
     ])
-    <div class="d-flex justify-content-start mb-3">
-        <a href="{{ route('items.create') }}" class="btn btn-success"><i class="fas fa-plus"></i> 新增</a>
+    <div class="row mt-5 mb-2">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <a href="{{ route('items.create') }}" class="btn btn-success"><i class="fas fa-plus"></i> 新增</a>
+            <form method="GET" action="{{ route('items.index') }}" class="d-flex gap-2 align-items-center">
+                <select name="filter_column" class="form-select w-auto">
+                    <option value="title" {{ request('filter_column') == 'title' ? 'selected' : '' }}>名稱</option>
+                    <option value="desc" {{ request('filter_column') == 'desc' ? 'selected' : '' }}>描述</option>
+                    <option value="price" {{ request('filter_column') == 'price' ? 'selected' : '' }}>價格</option>
+                </select>
+                <input type="text" name="search" class="form-control" placeholder="輸入關鍵字">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                <a href="{{ route('items.index') }}" class="btn btn-secondary"><i class="fas fa-sync-alt"></i></a>
+            </form>
+        </div>
     </div>
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover shadow-sm text-center align-middle">
             <thead class="table-light">
                 <tr>
-                    <th style="width: 15%;">名稱</th>
+                    <th style="width: 15%;">
+                        <a href="{{ route('items.index', ['sort' => 'title', 'order' => request('sort') === 'title' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
+                            名稱 {!! request('sort') === 'title' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
+                        </a>
+                    </th>
                     <th style="width: 10%;">照片</th>
-                    <th style="width: 10%;">價格</th>
-                    <th style="width: 25%;">描述</th>
-                    <th style="width: 10%;">狀態</th>
+                    <th style="width: 10%;">
+                        <a href="{{ route('items.index', ['sort' => 'price', 'order' => request('sort') === 'price' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
+                            價格 {!! request('sort') === 'price' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
+                        </a>
+                    </th>
+                    <th style="width: 25%;">
+                        <a href="{{ route('items.index', ['sort' => 'desc', 'order' => request('sort') === 'desc' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
+                            描述 {!! request('sort') === 'desc' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
+                        </a>
+                    </th>
+                    <th style="width: 10%;">
+                        <a href="{{ route('items.index', ['sort' => 'enabled', 'order' => request('sort') === 'enabled' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
+                            狀態 {!! request('sort') === 'enabled' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
+                        </a>
+                    </th>
                     <th style="width: 20%;">修改時間</th>
                     <th style="width: 15%;">操作</th>
                 </tr>
@@ -68,6 +96,10 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <!-- 分頁功能 -->
+    <div class="mt-1">
+        {{ $items->links('vendor.pagination.bootstrap-5') }}
     </div>
 </div>
 

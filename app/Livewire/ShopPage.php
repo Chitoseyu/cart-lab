@@ -4,19 +4,29 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Item;
+use Illuminate\Http\Request;
 
 class ShopPage extends Component
 {
+
+    public $currentPage = 1;
 
     public function mount(){
         $cart = session('cart', ['items' => []]);
         session(['cart' => $cart]);
     }
 
-    public function render()
+    public function render(Request $request)
     {
-        $items = Item::where('enabled', 1)->get();
-        return view('livewire.shop-page',['items'=> $items]);
+        $query = Item::where('enabled', 1); // 只顯示啟用的商品
+
+        $page = (int) ($request->input('page') ?? $this->currentPage);
+
+        $this->currentPage = $page; // 更新當前頁數
+
+        $items = $query->paginate(10, ['*'], 'page', $page);
+
+        return view('livewire.shop-page', compact('items'));
     }
     // 新增至購物車
     public function addCart($id)

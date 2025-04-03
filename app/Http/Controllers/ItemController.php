@@ -62,9 +62,30 @@ class ItemController extends Controller
      }
 
     // 顯示商品管理列表
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::orderBy('created_at', 'desc')->get();
+        $query = Item::query();
+        // 搜尋功能
+        if ($request->has('search') && $request->filled('search')) {
+            $filterColumn = $request->get('filter_column', 'title'); // 預設搜尋 title
+            $searchTerm = $request->get('search');
+            
+            $query->where($filterColumn, 'LIKE', "%{$searchTerm}%");
+            
+        }
+         // 排序功能
+        $sort = $request->get('sort', 'updated_at'); // 預設排序欄位
+        $order = $request->get('order', 'desc'); // 預設降序
+
+        // 允許的排序欄位
+        $allowedSorts = ['title', 'price', 'desc', 'enabled', 'updated_at'];
+
+        if (in_array($sort, $allowedSorts)) {
+            $query->orderBy($sort, $order);
+        }
+        $items = $query->paginate(10)->appends($request->query());
+
+
         return view('page.product.index', compact('items'));
     }
 

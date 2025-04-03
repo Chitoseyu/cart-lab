@@ -13,9 +13,8 @@ class CartIcon extends Component
     public function mount()
     {
         $cart = session('cart', ['items' => []]);
-        session(['cart' => $cart]);
+        session(['cart' =>  $cart]);
 
-     
         // 計算所有商品的數量總和
         if(!empty($cart['items'])){
             $this->cartTotal = count($cart['items']);
@@ -23,6 +22,11 @@ class CartIcon extends Component
         $totalQty = $this->cartTotal;
         
         $this->dispatch('cartTotalUpdated',  $totalQty);
+     
+    }
+    public function render()
+    {
+        return view('livewire.cart-icon');
     }
 
     public function updateCartTotal($totalQty)
@@ -34,8 +38,5 @@ class CartIcon extends Component
         return redirect()->route('orders.cartlist');
     }
 
-    public function render()
-    {
-        return view('livewire.cart-icon');
-    }
+  
 }
