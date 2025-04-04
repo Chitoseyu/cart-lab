@@ -17,7 +17,7 @@ class CartComponent extends Component
     // 付款成功頁面
     public function payOk()
     {
-        return view('orders.payok');
+        return view('page.orders.payok');
     }
      // 新增：增加購物車中指定商品的數量
      public function increaseCart($id)
@@ -53,12 +53,19 @@ class CartComponent extends Component
          $order = Order::create([
              // 'user_id' => auth()->id(),
              'user_id' => 1,
+             'total_price' => 0, // 先預設為 0
          ]);
- 
+
+
+         $totalPrice = 0;
+         
          // 插入訂單商品
          foreach ($orderData['items'] as $item) {
              $order->items()->attach($item['id'], ['qty' => $item['qty']]);
+             $totalPrice += ($item['price'] * $item['qty']);
          }
+         // 更新訂單總價
+         $order->update(['total_price' => $totalPrice]);
  
          // 清除 session，防止重複下單
          session()->forget('cart');

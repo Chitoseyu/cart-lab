@@ -1,12 +1,10 @@
-<div class="col-md-6">
-    <ul class="list-group">
+<div class="col-12"> <ul class="list-group">
         @if ($items->isNotEmpty())
             @foreach ($items as $item)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <img src="{{ asset('storage/images/product/' . $item->pic) }}" width="80" height="80" class="me-3" alt="{{ $item->title }}">
+                <li class="list-group-item d-flex align-items-center">
+                    <div class="d-flex align-items-center flex-grow-1"> <img src="{{ asset('storage/images/product/' . $item->pic) }}" width="80" height="80" class="me-3 rounded" alt="{{ $item->title }}">
                         <div>
-                            <a href="{{ url('product/detail/' . $item->id) }}" class="btn btn-link p-0 text-decoration-none">
+                            <a href="{{ url('product/detail/' . $item->id) }}" class="text-decoration-none">
                                 <h6 class="mb-1">{{ $item->title }}</h6>
                             </a>
                             <small class="text-muted">單價: ${{ $item->price }}</small>
@@ -14,20 +12,20 @@
                     </div>
                     <div>
                         @if (session()->has('cart.items.' . $item->id))
-                            <button wire:click="removeCart({{ $item->id }})" class="btn btn-outline-danger btn-sm">移除</button>
+                            <button wire:click="removeCart({{ $item->id }})" class="btn btn-outline-danger btn-sm me-2">移除</button>
                         @endif
                         <button wire:click="addCart({{ $item->id }})" class="btn btn-outline-primary btn-sm">加入</button>
                     </div>
                 </li>
             @endforeach
-            <!-- 分頁按鈕 -->
+
             @if ($items->hasPages())
-            <li wire:ignore class="list-group-item d-flex justify-content-center mt-1">
-                {{ $items->links('vendor.pagination.bootstrap-4') }}
-            </li>
+                <li wire:ignore class="list-group-item d-flex justify-content-center mt-1">
+                    {{ $items->links('vendor.pagination.bootstrap-4') }}
+                </li>
             @endif
         @else
-            <p class="text-muted text-center">沒有找到符合條件的商品。</p>
+            <li class="list-group-item text-center text-muted">沒有找到符合條件的商品。</li>
         @endif
     </ul>
 </div>

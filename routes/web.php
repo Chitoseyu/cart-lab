@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\OrderController;
 use App\Livewire\ShopPage;
 use App\Livewire\CartComponent;
 /*
@@ -45,6 +46,9 @@ Route::group(['prefix' => 'product'], function () {
 Route::group(['prefix' => 'orders'], function () {
     Route::get('/payok', [CartComponent::class, 'payOk'])->name('orders.payok');
     Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('orders.cartlist');
+    Route::get('/list', [OrderController::class, 'list'])->name('orders.list');
+    Route::delete('/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::post('/bulk-delete', [OrderController::class, 'bulkDelete'])->name('orders.bulkDelete');
 
     Route::post('/cartadd', [ItemController::class, 'addToCart'])->name('orders.cart.add');
     Route::post('/checkout', [ItemController::class, 'directCheckout'])->name('orders.checkout');

@@ -13,7 +13,7 @@
     ])
     <div class="row mt-5 mb-2">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <a href="{{ route('items.create') }}" class="btn btn-success"><i class="fas fa-plus"></i> 新增</a>
+            <a href="{{ route('items.create') }}" class="btn btn-success"  data-tippy-content="新增"><i class="fas fa-plus"></i> </a>
             <form method="GET" action="{{ route('items.index') }}" class="d-flex gap-2 align-items-center">
                 <select name="filter_column" class="form-select w-auto">
                     <option value="title" {{ request('filter_column') == 'title' ? 'selected' : '' }}>名稱</option>
@@ -21,8 +21,8 @@
                     <option value="price" {{ request('filter_column') == 'price' ? 'selected' : '' }}>價格</option>
                 </select>
                 <input type="text" name="search" class="form-control" placeholder="輸入關鍵字">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
-                <a href="{{ route('items.index') }}" class="btn btn-secondary"><i class="fas fa-sync-alt"></i></a>
+                <button type="submit" class="btn btn-primary" data-tippy-content="搜尋"><i class="fas fa-search"></i></button>
+                <a href="{{ route('items.index') }}" class="btn btn-secondary" data-tippy-content="重新整理"><i class="fas fa-sync-alt"></i></a>
             </form>
         </div>
     </div>
@@ -84,8 +84,8 @@
                         <td>{{ $item->updated_at->format('Y-m-d H:i') }}</td>
                         <td>
                             <div class="d-flex gap-2 justify-content-center">
-                                <button type="button" class="btn btn-warning btn-sm edit-item" data-id="{{ $item->id }}"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-danger btn-sm delete-item" data-id="{{ $item->id }}"><i class="fas fa-trash-alt"></i></button>
+                                <button type="button" class="btn btn-warning btn-sm edit-item" data-tippy-content="編輯" data-id="{{ $item->id }}"><i class="fas fa-edit"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm delete-item" data-tippy-content="刪除" data-id="{{ $item->id }}"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -105,6 +105,13 @@
 
 <script>
 $(document).ready(function() {
+    $('[data-tippy-content]').each(function() {
+        tippy(this, {
+            content: $(this).data('tippy-content'),
+            placement: 'top',
+            theme: 'light',
+        });
+    });
 
     @if(session('message'))
         Swal.fire({

@@ -38,11 +38,21 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">是否啟用</label>
-                    <select class="form-control" name="enabled">
-                        <option value="1" {{ isset($item) && $item->enabled ? 'selected' : '' }}>啟用</option>
-                        <option value="0" {{ isset($item) && !$item->enabled ? 'selected' : '' }}>停用</option>
-                    </select>
+                    <label class="form-label d-block">商品狀態</label>
+                    <div class="d-flex align-items-center">
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="enabled" id="enabled1" value="1" {{ isset($item) && $item->enabled ? 'checked' : '' }}>
+                            <label class="form-check-label" for="enabled1">
+                                啟用
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="enabled" id="enabled0" value="0" {{ isset($item) && !$item->enabled ? 'checked' : '' }}>
+                            <label class="form-check-label" for="enabled0">
+                                停用
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">

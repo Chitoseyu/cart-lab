@@ -169,6 +169,7 @@ class ItemController extends Controller
         
         return redirect()->route('items.index')->with($response);
     }
+    // 刪除商品
     public function destroy($id)
     {
         $item = Item::findOrFail($id);
