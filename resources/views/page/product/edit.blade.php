@@ -33,15 +33,20 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="stock" class="form-label">庫存數量</label>
+                    <input type="number" class="form-control" id="stock" name="stock" value="{{ old('stock', $item->stock ?? 1) }}" min="0" required>
+                </div>
+
+                <div class="mb-3">
                     <label for="desc" class="form-label">商品描述</label>
-                    <textarea class="form-control" id="desc" name="desc" rows="3" required>{{ old('desc', $item->desc ?? '') }}</textarea>
+                    <textarea class="form-control" id="desc" name="desc" rows="3">{{ old('desc', $item->desc ?? '') }}</textarea>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label d-block">商品狀態</label>
                     <div class="d-flex align-items-center">
                         <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="enabled" id="enabled1" value="1" {{ isset($item) && $item->enabled ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="enabled" id="enabled1" value="1" {{ !isset($item) || $item->enabled ? 'checked' : '' }}>
                             <label class="form-check-label" for="enabled1">
                                 啟用
                             </label>

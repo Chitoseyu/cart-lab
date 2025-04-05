@@ -53,3 +53,18 @@
         <button onclick="window.location='{{ url('/product/list') }}'" class="btn btn-secondary mt-3">再逛逛</button>
     @endif
 </div>
+<script>
+$(document).ready(function() {
+
+    Livewire.on('showAlert', function(info) {
+            if (info) {
+                Swal.fire({
+                    icon: info[0]['type'],
+                    title: '操作訊息',
+                    html: info[0]['message'],
+                    showConfirmButton: true
+                });
+            }
+    });
+});
+</script>

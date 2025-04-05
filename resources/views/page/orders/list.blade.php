@@ -69,39 +69,40 @@
 <div class="container mt-5" style="min-height:80vh;">
     <h2 class="mb-4">訂單管理</h2>
 
-    <!-- 批次刪除操作 -->
-    <!-- <div class="mb-3 d-flex justify-content-between align-items-center">
-        <div>
-            <input type="checkbox" id="select-all">
-            <label for="select-all" class="ms-1">全選</label>
+
+    <!-- 搜尋欄 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="GET" action="{{ route('orders.list') }}">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="輸入訂單編號或商品名稱" value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
         </div>
-        <button type="button" class="btn btn-danger btn-sm delete-selected" disabled>
-            <i class="fas fa-trash-alt"></i>
-        </button>
-    </div> -->
+    </div>
 
     @forelse($orders as $order)
         <div class="card mb-4 shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
-                    <!-- <input type="checkbox" class="order-checkbox" value="{{ $order->id }}"> -->
                     <div>
                         <span class="fw-bold">訂單編號：#{{ $order->id }}</span>
                         <br>
-                        <small class="text-muted">下單時間：{{ $order->created_at->format('Y-m-d H:i') }}</small>
+                        <small class="text-muted">訂單日期：{{ $order->created_at->format('Y-m-d') }}</small>
                     </div>
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm delete-order" data-id="{{ $order->id }}">
+                <button type="button" class="btn btn-outline-danger btn-sm delete-order" data-id="{{ $order->id }}" data-bs-toggle="tooltip" title="刪除訂單">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
             <div class="card-body">
                 <p class="mb-1"><strong>總商品數量：</strong> {{ $order->items->sum('pivot.qty') }}</p>
-                <p class="mb-3"><strong>訂單總金額：</strong> ${{ number_format($order->sum, 0) }}</p>
+                <p class="mb-3"><strong>訂單總金額：</strong> ${{ number_format($order->total_price, 0) }}</p>
 
-                <hr>
-
-                <!-- 運送狀態區塊 Start -->
+                <!-- 運送狀態區塊 (原先流程) -->
                 @php
                     $status = $order->status ?? 1;
                     $steps = [
@@ -133,7 +134,7 @@
                         @endforeach
                     </ul>
                 </div>
-                <!-- 運送狀態區塊 End -->
+                <!-- End 運送狀態區塊 -->
 
                 <hr>
                 <h5 class="mb-3">商品明細：</h5>
@@ -143,10 +144,10 @@
                             <div>
                                 <strong>{{ $item->title }}</strong>
                                 <br>
-                                單價：${{ number_format($item->price, 0) }} × 數量：{{ $item->pivot->qty }}
+                                單價：${{ number_format($item->pivot->order_price, 0) }} × 數量：{{ $item->pivot->qty }}
                             </div>
                             <span class="badge bg-primary">
-                                ${{ number_format($item->price * $item->pivot->qty, 0) }}
+                                ${{ number_format($item->pivot->order_price * $item->pivot->qty, 0) }}
                             </span>
                         </li>
                     @endforeach
@@ -163,7 +164,7 @@
     </div>
 </div>
 
-<!-- 隱藏的刪除表單 -->
+<!-- 刪除表單 -->
 <form id="delete-order-form" method="POST" style="display: none;">
     @csrf
     @method('DELETE')
@@ -171,6 +172,15 @@
 
 <script>
 $(document).ready(function() {
+
+    // 當搜尋欄內容改變
+    $('input[name="search"]').on('input', function() {
+        let keyword = $(this).val().trim();
+        // 如果內容為空，重置搜尋
+        if (keyword === '') {
+            $(this).closest('form').submit();
+        }
+    });
 
     // 單筆刪除訂單
     $('.delete-order').click(function() {
@@ -191,57 +201,6 @@ $(document).ready(function() {
         });
     });
 
-    // 全選/取消全選
-    $('#select-all').change(function() {
-        $('.order-checkbox').prop('checked', this.checked);
-        updateDeleteButtonState();
-    });
-
-    $('.order-checkbox').change(function() {
-        let allChecked = $('.order-checkbox').length === $('.order-checkbox:checked').length;
-        $('#select-all').prop('checked', allChecked);
-        updateDeleteButtonState();
-    });
-
-    function updateDeleteButtonState() {
-        $('.delete-selected').prop('disabled', $('.order-checkbox:checked').length === 0);
-    }
-
-    // 批次刪除
-    $('.delete-selected').click(function() {
-        let selectedOrders = $('.order-checkbox:checked').map(function() {
-            return $(this).val();
-        }).get();
-
-        if (selectedOrders.length === 0) return;
-
-        Swal.fire({
-            title: '確定要刪除選取的訂單嗎？',
-            text: "這將永久刪除 " + selectedOrders.length + " 筆訂單！",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: '刪除',
-            cancelButtonText: '取消'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '{{ route("orders.bulkDelete") }}',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        order_ids: selectedOrders
-                    },
-                    success: function(response) {
-                        Swal.fire('已刪除！', '選取的訂單已成功刪除。', 'success').then(() => {
-                            location.reload();
-                        });
-                    }
-                });
-            }
-        });
-    });
 
     // 顯示操作訊息
     @if(session('message'))

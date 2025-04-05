@@ -13,15 +13,12 @@ class Order extends Model
 
     // 訂單有哪些商品
     public function items(){
-        return $this->belongsToMany(\App\Models\Item::class)->withTimestamps()->withPivot('qty');
+        return $this->belongsToMany(\App\Models\Item::class)->withTimestamps()->withPivot('qty', 'order_price'); 
     }
     public function getSumAttribute(){
-        $orderItems = $this->items;
-        $sum = 0;
-        foreach($orderItems as $item){
-            $sum += ($item->price * $item->pivot->qty);
-        }
-        return $sum;
+        return $this->items->sum(function($item) {
+            return $item->pivot->order_price * $item->pivot->qty;
+        });
     }
 
 }

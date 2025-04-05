@@ -42,6 +42,11 @@
                             價格 {!! request('sort') === 'price' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
                         </a>
                     </th>
+                    <th style="width: 10%;">
+                        <a href="{{ route('items.index', ['sort' => 'stock', 'order' => request('sort') === 'stock' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
+                            庫存 {!! request('sort') === 'stock' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
+                        </a>
+                    </th>
                     <th style="width: 25%;">
                         <a href="{{ route('items.index', ['sort' => 'desc', 'order' => request('sort') === 'desc' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
                             描述 {!! request('sort') === 'desc' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
@@ -71,15 +76,20 @@
                             @endif
                         </td>
                         <td>${{ number_format($item->price, 0) }}</td>
+                        <td>
+                            <span class="badge bg-primary">{{ $item->stock }}</span>
+                        </td>
                         <td class="text-truncate" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             {{ mb_strimwidth($item->desc, 0, 30, '...') }}
                         </td>
                         <td>
-                            @if($item->enabled)
-                                <span class="badge bg-success">啟用</span>
-                            @else
-                                <span class="badge bg-secondary">停用</span>
-                            @endif
+                            <span class="badge status-toggle badge-sm px-3 py-2 cursor-pointer 
+                                {{ $item->enabled ? 'bg-success' : 'bg-secondary' }}"
+                                data-id="{{ $item->id }}"
+                                data-status="{{ $item->enabled ? '1' : '0' }}"
+                                style="cursor: pointer;">
+                                {{ $item->enabled ? '啟用' : '停用' }}
+                            </span>
                         </td>
                         <td>{{ $item->updated_at->format('Y-m-d H:i') }}</td>
                         <td>
@@ -154,6 +164,46 @@ $(document).ready(function() {
 
                 $('body').append(form);
                 form.submit();
+            }
+        });
+    });
+
+    // 狀態切換
+    $('.status-toggle').click(function () {
+        let $badge = $(this);
+        let itemId = $badge.data('id');
+        let currentStatus = $badge.data('status');
+
+        $.ajax({
+            url: `/product/items/toggle-status/${itemId}`,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+            },
+            success: function (response) {
+                if (response.success) {
+                    // 更新樣式與文字
+                    if (response.new_status === 1) {
+                        $badge.removeClass('bg-secondary').addClass('bg-success').text('啟用').data('status', 1);
+                    } else {
+                        $badge.removeClass('bg-success').addClass('bg-secondary').text('停用').data('status', 0);
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '狀態已更新',
+                        text: `商品狀態已變更為「${response.new_status === 1 ? '啟用' : '停用'}」`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: '操作失敗',
+                    text: '無法更新商品狀態，請稍後再試',
+                });
             }
         });
     });

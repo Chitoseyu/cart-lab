@@ -78,7 +78,7 @@ class ItemController extends Controller
         $order = $request->get('order', 'desc'); // 預設降序
 
         // 允許的排序欄位
-        $allowedSorts = ['title', 'price', 'desc', 'enabled', 'updated_at'];
+        $allowedSorts = ['title', 'price', 'stock', 'desc', 'enabled', 'updated_at'];
 
         if (in_array($sort, $allowedSorts)) {
             $query->orderBy($sort, $order);
@@ -101,8 +101,9 @@ class ItemController extends Controller
      {
         $validated = $request->validate([
             'title'   => 'required|string|max:255',
-            'price'   => 'required|int|min:0',
-            'desc'    => 'required|string',
+            'price'   => 'required|int|min:1',
+            'stock'   => 'required|integer|min:0',
+            'desc'    => 'nullable|string',
             'enabled' => 'required|boolean',
             'pic'     => 'nullable|image|max:2048', // 限制圖片大小 2MB
         ]);
@@ -138,7 +139,8 @@ class ItemController extends Controller
         $validated = $request->validate([
             'title'   => 'required|string|max:100',
             'price'   => 'required|int|min:1',
-            'desc'    => 'required|string',
+            'stock'   => 'required|integer|min:0',
+            'desc'    => 'nullable|string',
             'enabled' => 'required|boolean',
             'pic'     => 'nullable|image|max:2048',
         ]);
@@ -168,6 +170,18 @@ class ItemController extends Controller
 
         
         return redirect()->route('items.index')->with($response);
+    }
+    // 更新商品狀態
+    public function toggleStatus($id)
+    {
+        $item = Item::findOrFail($id);
+        $item->enabled = !$item->enabled;
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'new_status' => $item->enabled ? 1 : 0
+        ]);
     }
     // 刪除商品
     public function destroy($id)

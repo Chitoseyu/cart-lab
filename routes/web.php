@@ -36,6 +36,7 @@ Route::group(['prefix' => 'product'], function () {
     Route::get('/create', [ItemController::class, 'form'])->name('items.create');
     Route::get('/edit/{id}', [ItemController::class, 'form'])->name('items.edit');
     Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+    Route::post('/items/toggle-status/{id}', [ItemController::class, 'toggleStatus'])->name('items.toggleStatus');
     Route::put('/items/{id}', [ItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy');
 
@@ -48,7 +49,7 @@ Route::group(['prefix' => 'orders'], function () {
     Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('orders.cartlist');
     Route::get('/list', [OrderController::class, 'list'])->name('orders.list');
     Route::delete('/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
-    Route::post('/bulk-delete', [OrderController::class, 'bulkDelete'])->name('orders.bulkDelete');
+    // Route::post('/bulk-delete', [OrderController::class, 'bulkDelete'])->name('orders.bulkDelete');
 
     Route::post('/cartadd', [ItemController::class, 'addToCart'])->name('orders.cart.add');
     Route::post('/checkout', [ItemController::class, 'directCheckout'])->name('orders.checkout');
