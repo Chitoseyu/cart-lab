@@ -21,8 +21,24 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'gender',
+        'birthday',
+        'avatar',
+        'address',
+        'zip_code',
+        'city',
+        'district',
+        'status',
+        'last_login_at',
+        'login_ip',
+        'is_subscribed',
+        'role',
+        'provider',
+        'provider_id',
+        'membership_level',
     ];
-
+  
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -31,6 +47,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'provider_id',
     ];
 
     /**
@@ -41,5 +58,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'birthday' => 'date',
+        'last_login_at' => 'datetime',
+        'status' => 'boolean',
+        'is_subscribed' => 'boolean',
     ];
 }

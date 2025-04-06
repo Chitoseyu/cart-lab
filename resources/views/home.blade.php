@@ -2,6 +2,13 @@
 
 @section('title', '首頁')
 
+<style>
+.toast-custom {
+    position: fixed;
+    top: 10%;
+    right: 1%;
+}
+</style>
 @section('content')
     <div class="container mt-5" style="min-height:80vh;">
         <div class="jumbotron text-center">
@@ -17,4 +24,14 @@
             <a href="/product/list" class="btn btn-secondary btn-lg">瀏覽所有商品</a>
         </div>
     </div>
+    @if(session('message'))
+        <script>
+            toastr.options = {
+                positionClass: 'toast-custom', // 設定顯示位置
+                timeOut: 3000, // 設定訊息顯示時間
+                extendedTimeOut: 3000, // 設定滑鼠懸停時的顯示時
+            };
+            toastr.{{ session('type', 'info') }}('{{ session('message') }}');
+        </script>
+    @endif
 @endsection

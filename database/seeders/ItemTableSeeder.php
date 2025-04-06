@@ -27,11 +27,13 @@ class ItemTableSeeder extends Seeder
         ];
 
         foreach ($items as $key=> $item) {
-            Item::create([
-                'title' => $item['title'],
-                'price' => $item['price'],
-                'pic' =>  $key'.jpg', // 產生圖片名稱
-            ]);
+            Item::firstOrCreate(
+                ['title' => $item['title']], // 檢查條件
+                [
+                    'price' => $item['price'],
+                    'pic' => $key . '.png', // 產生圖片名稱
+                ]
+            );
         }
     }
 }

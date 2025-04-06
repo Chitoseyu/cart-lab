@@ -45,6 +45,12 @@ class CartComponent extends Component
      // 結帳完成並送出訂單
      public function checkout()
      {
+       
+        if (!auth()->check()) {
+            $response = ['type'  => 'error','message' => '請先登入後再結帳'];
+            return redirect()->route('shop.login_page')->with($response);
+        }
+
          $orderData = session()->get('cart');
  
          if (!$orderData || empty($orderData['items'])) {
@@ -103,7 +109,7 @@ class CartComponent extends Component
          
          // 所有商品都有效，建立新訂單
          $order = Order::create([
-             'user_id' => 1, //  auth()->id()
+             'user_id' =>  auth()->id(),
              'total_price' => 0, // 先預設為0
          ]);
          

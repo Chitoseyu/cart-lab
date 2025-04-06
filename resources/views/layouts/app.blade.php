@@ -13,6 +13,10 @@
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+     <!-- Toastr -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <!-- Tippy  -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
@@ -51,7 +55,21 @@
                 e.preventDefault();
                 $('html, body').animate({scrollTop : 0}, 300);
             });
+
+            // 顯示隱藏密碼區塊
+            $(document).on('click', '.toggle-password', function() {
+                    const input = $($(this).data('target'));
+                    const icon = $(this).find('i');
+                    if (input.attr('type') === 'password') {
+                        input.attr('type', 'text');
+                        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                    } else {
+                        input.attr('type', 'password');
+                        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                    }
+                });
         });
+       
     </script>
 
 </body>
