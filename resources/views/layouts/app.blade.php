@@ -28,7 +28,7 @@
 </head>
 <body>
     @include('components.navbar')
-    <div class="container mt-4">
+    <div class="container mt-4" style="min-height:80vh;">
         @isset($slot)
         {{$slot}}
         @endisset

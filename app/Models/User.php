@@ -63,4 +63,14 @@ class User extends Authenticatable
         'status' => 'boolean',
         'is_subscribed' => 'boolean',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function membershipLevel()
+    {
+        return $this->belongsTo(MembershipLevel::class);
+    }
 }

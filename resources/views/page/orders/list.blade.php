@@ -22,6 +22,7 @@
     position: relative;
     width: 20%;
     text-align: center;
+    cursor: pointer;
 }
 
 .timeline-content {
@@ -61,16 +62,16 @@
     font-size: 0.8em;
     color: #6c757d;
 }
+.timeline-item.disabled {
+    pointer-events: none;
+}
 /* 運送狀態區塊 End */
-
 </style>
 
 @section('content')
-<div class="container mt-5" style="min-height:80vh;">
+<div class="container mt-5">
     <h2 class="mb-4">訂單管理</h2>
 
-
-    <!-- 搜尋欄 -->
     <div class="row mb-4">
         <div class="col-12">
             <form method="GET" action="{{ route('orders.list') }}">
@@ -92,17 +93,22 @@
                         <span class="fw-bold">訂單編號：#{{ $order->id }}</span>
                         <br>
                         <small class="text-muted">訂單日期：{{ $order->created_at->format('Y-m-d') }}</small>
+                        @if(Auth::user()->role_id == 1)
+                            <br>
+                            <small class="text-muted">下訂用戶：{{ $order->user->name }}</small>
+                        @endif
                     </div>
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm delete-order" data-id="{{ $order->id }}" data-bs-toggle="tooltip" title="刪除訂單">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
+                @if(Auth::user()->role_id != 1 || Auth::user()->id == $order->user_id)
+                    <button type="button" class="btn btn-outline-danger btn-sm delete-order" data-id="{{ $order->id }}" data-bs-toggle="tooltip" title="刪除訂單">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                @endif
             </div>
             <div class="card-body">
                 <p class="mb-1"><strong>總商品數量：</strong> {{ $order->items->sum('pivot.qty') }}</p>
                 <p class="mb-3"><strong>訂單總金額：</strong> ${{ number_format($order->total_price, 0) }}</p>
 
-                <!-- 運送狀態區塊 (原先流程) -->
                 @php
                     $status = $order->status ?? 1;
                     $steps = [
@@ -116,7 +122,7 @@
                 <div class="timeline-container my-5">
                     <ul class="timeline">
                         @foreach($steps as $step => $label)
-                            <li class="timeline-item {{ $status >= $step ? 'active' : '' }}">
+                            <li class="timeline-item {{ $status >= $step ? 'active' : '' }} {{ Auth::user()->role_id != 1 ? 'disabled' : '' }}" data-order-id="{{ $order->id }}" data-step="{{ $step }}">
                                 <div class="timeline-content">
                                     <span class="timeline-label">{{ $label }}</span>
                                     <div class="timeline-dot"></div>
@@ -134,8 +140,6 @@
                         @endforeach
                     </ul>
                 </div>
-                <!-- End 運送狀態區塊 -->
-
                 <hr>
                 <h5 class="mb-3">商品明細：</h5>
                 <ul class="list-group">
@@ -158,13 +162,11 @@
         <p class="text-muted text-center">目前沒有訂單</p>
     @endforelse
 
-    <!-- 分頁功能 -->
     <div class="d-flex justify-content-center mt-4">
         {{ $orders->links('vendor.pagination.bootstrap-4') }}
     </div>
 </div>
 
-<!-- 刪除表單 -->
 <form id="delete-order-form" method="POST" style="display: none;">
     @csrf
     @method('DELETE')
@@ -172,16 +174,6 @@
 
 <script>
 $(document).ready(function() {
-
-    // 當搜尋欄內容改變
-    $('input[name="search"]').on('input', function() {
-        let keyword = $(this).val().trim();
-        // 如果內容為空，重置搜尋
-        if (keyword === '') {
-            $(this).closest('form').submit();
-        }
-    });
-
     // 單筆刪除訂單
     $('.delete-order').click(function() {
         let orderId = $(this).data('id');
@@ -201,6 +193,36 @@ $(document).ready(function() {
         });
     });
 
+    // 更改訂單運送狀態
+    $('.timeline-item').click(function() {
+        let roleId = '{{ Auth::user()->role_id }}';
+
+        if (roleId != 1) {
+            return;
+        }
+
+        let orderId = $(this).data('order-id');
+        let step = $(this).data('step');
+
+        $.ajax({
+            url: '/orders/' + orderId + '/status',
+            type: 'PUT',
+            data: {
+                status: step,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    location.reload(); // 重新載入頁面以更新狀態
+                } else {
+                    Swal.fire('錯誤', response.message || '更改訂單狀態失敗', 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('錯誤', '更改訂單狀態失敗', 'error');
+            }
+        });
+    });
 
     // 顯示操作訊息
     @if(session('message'))

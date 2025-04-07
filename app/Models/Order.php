@@ -20,5 +20,10 @@ class Order extends Model
             return $item->pivot->order_price * $item->pivot->qty;
         });
     }
+    // 訂單的用戶
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
 }

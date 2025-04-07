@@ -76,6 +76,8 @@ Route::group(['prefix' => 'orders'], function () {
     Route::group(['middleware' => 'user.login'], function () {
         // 檢視訂單
         Route::get('/list', [OrderController::class, 'list'])->name('orders.list');
+        // 更改訂單狀態
+        Route::put('/{order}/status', [OrderController::class, 'updateStatus']);
         // 刪除訂單
         Route::delete('/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
         // 直接購買

@@ -37,8 +37,10 @@ class ItemController extends Controller
         }
 
         session()->put('cart', $orders);
+
+        $response = ['type'  => 'success','message' => $message];
         
-        return redirect()->back();
+        return redirect()->back()->with($response);
     }
      // 立即購買
      public function directCheckout(Request $request)
@@ -200,7 +202,7 @@ class ItemController extends Controller
                 'type'  => 'success',
                 'message' => '商品已刪除！'
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'type'  => 'error',
                 'message' => '商品刪除失敗，請稍後再試！'
