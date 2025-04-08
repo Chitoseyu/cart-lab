@@ -56,20 +56,31 @@
                 $('html, body').animate({scrollTop : 0}, 300);
             });
 
-            // 顯示隱藏密碼區塊
-            $(document).on('click', '.toggle-password', function() {
-                    const input = $($(this).data('target'));
-                    const icon = $(this).find('i');
+            // 顯示/隱藏密碼
+            $(document).on('click', '.toggle-password', function () {
+                const icon = $(this).find('i');
+                const buttonText = $(this);
+                const inputs = ['#password', '#password_confirmation'];
+
+                inputs.forEach(function (selector) {
+                    const input = $(selector);
                     if (input.attr('type') === 'password') {
                         input.attr('type', 'text');
-                        icon.removeClass('fa-eye').addClass('fa-eye-slash');
                     } else {
                         input.attr('type', 'password');
-                        icon.removeClass('fa-eye-slash').addClass('fa-eye');
                     }
                 });
-        });
-       
+               // 切換圖示和文字
+                if (icon.hasClass('fa-eye')) {
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                    buttonText.html('<i class="fas fa-eye-slash"></i> 隱藏');
+                } else {
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                    buttonText.html('<i class="fas fa-eye"></i> 顯示');
+                }
+            });
+
+    });
     </script>
 
 </body>

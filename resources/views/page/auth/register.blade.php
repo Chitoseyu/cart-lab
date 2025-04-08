@@ -32,23 +32,22 @@
                             <label for="email" class="form-label">電子信箱</label>
                             <input type="email" class="form-control form-control-sm" id="email" name="email" value="{{ old('email') }}" required>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             <label for="password" class="form-label">密碼</label>
                             <div class="input-group">
                                 <input type="password" class="form-control form-control-sm" id="password" name="password" required>
-                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password">
-                                    <i class="fas fa-eye"></i>
-                                </button>
                             </div>
                             <div class="form-text text-muted">密碼至少需為 6 碼</div>
+
+                            <!-- 右上角顯示/隱藏按鈕 -->
+                            <button type="button" class="btn btn-sm toggle-password position-absolute top-0 end-0 mt-2 me-2 p-0 border-0 bg-transparent">
+                                <i class="fas fa-eye-slash"></i> 隱藏
+                            </button>
                         </div>
                         <div class="mb-4">
                             <label for="password_confirmation" class="form-label">確認密碼</label>
                             <div class="input-group">
                                 <input type="password" class="form-control form-control-sm" id="password_confirmation" name="password_confirmation" required>
-                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password_confirmation">
-                                    <i class="fas fa-eye"></i>
-                                </button>
                             </div>
                         </div>
 

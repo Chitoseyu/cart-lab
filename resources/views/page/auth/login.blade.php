@@ -36,14 +36,14 @@
                             <label for="email" class="form-label">帳號（Email）</label>
                             <input type="text" class="form-control form-control-sm" id="email" name="email" value="{{ old('email') }}" required autofocus>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-4 position-relative">
                             <label for="password" class="form-label">密碼</label>
                             <div class="input-group">
                                 <input type="password" class="form-control form-control-sm" id="password" name="password" required>
-                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password">
-                                    <i class="fas fa-eye"></i>
-                                </button>
                             </div>
+                            <button type="button" class="btn btn-sm toggle-password position-absolute top-0 end-0 mt-2 me-2 p-0 border-0 bg-transparent">
+                                <i class="fas fa-eye-slash"></i> 隱藏
+                            </button>
                         </div>
 
                         <div class="d-grid mb-3">

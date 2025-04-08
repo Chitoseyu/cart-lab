@@ -66,13 +66,19 @@ class UserController extends Controller
             'membership_level_id' => $membership_level_id,
         ]);
 
+        // session 登入
         Auth::login($user);
 
-        $response = ['type'  => 'success','message' => '註冊完成! 已替您登入網站'];
+        $response = [
+            'type' => 'success',
+            'message' => '註冊完成! 已替您登入網站',
+        ];
+
         return redirect('/')->with($response);
     }
     public function user_logout(Request $request)
     {
+        // session 登出
         Auth::logout();
 
         // 讓 session 失效，防止 CSRF token 重複使用

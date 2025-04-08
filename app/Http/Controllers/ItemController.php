@@ -23,17 +23,24 @@ class ItemController extends Controller
         $orders = session()->get('cart', ['items' => []]);
         $item = Item::findOrFail($request->input('product_id'));
 
-        if (!isset($orders['items'][$item->id])) {
-            $orders['items'][$item->id] = [
-                'id' => $item->id,
-                'title' => $item->title,
-                'price' => $item->price,
-                'pic' => $item->pic,
-                'qty' => 1,
-            ];
-            $message = "{$item->title} 已加入購物車！";
-        } else {
-            $message = "{$item->title} 已存在購物車！";
+        // 庫存檢查
+        $item_stock = $item->stock;
+        if( $item_stock > 0){
+            if (!isset($orders['items'][$item->id])) {
+                $orders['items'][$item->id] = [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'price' => $item->price,
+                    'pic' => $item->pic,
+                    'qty' => 1,
+                ];
+                $message = "{$item->title} 已加入購物車！";
+            } else {
+                $message = "{$item->title} 已存在購物車！";
+            }
+        }
+        else{
+            $message = "{$item->title} 沒有庫存囉！";
         }
 
         session()->put('cart', $orders);
