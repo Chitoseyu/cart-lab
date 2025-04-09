@@ -8,22 +8,162 @@
     top: 10%;
     right: 1%;
 }
+.top-products-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.product-card {
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    background-color: #fff;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-card img {
+    width: 100%;
+    display: block;
+}
+
+.product-card .badge {
+    font-size: 0.85rem;
+}
+.product-info {
+    text-align: left;
+   font-weight: bold;
+}
+.product-title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.product-discount-badge {
+    background-color: #f0ad4e;
+    color: white;
+    padding: 3px 5px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    margin-left: 5px;
+}
+.price-container {
+    display: flex;
+    margin-bottom: 5px;
+}
+.product-price {
+    color: red;
+    margin-right: 5px;
+}
+
+.product-discounted-price {
+    text-decoration: line-through;
+    color: #888;
+}
 </style>
+
 @section('content')
     <div class="container mt-5">
         <div class="jumbotron text-center">
             <h1 class="display-4">歡迎來到我們的購物網站！</h1>
             <img src="{{ asset('storage/images/net_shop.png') }}" class="img-fluid mb-4" style="max-width: 50%;" alt="網路購物">
-            <p class="lead">在這裡，您可以找到各種優質商品，享受愉快的購物體驗。</p>
+            <p class="lead">在這裡，您可以找到各種優質商品，瀏覽我們的最新商品，或查看熱門商品推薦。</p>
             <hr class="my-4">
-            <p>瀏覽我們的最新商品，或查看熱門商品推薦。</p>
-            <a class="btn btn-primary btn-lg" href="/product/list" role="button">開始購物</a>
+        </div>
+
+        <div class="mt-5">
+            <h3 class="text-center mb-4">熱門商品</h3>
+            <div id="top-products" class="top-products-grid">
+            </div>
         </div>
 
         <div class="mt-5 text-center">
             <a href="/product/list" class="btn btn-secondary btn-lg">瀏覽所有商品</a>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            function loadTopProducts() {
+                $.ajax({
+                    url: "{{ route('orders.topProducts') }}",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.length === 0) {
+                            $.ajax({
+                                url: "{{ route('orders.randomProducts') }}",
+                                type: "GET",
+                                dataType: "json",
+                                success: function(randomData) {
+                                    renderProducts(randomData, true);
+                                },
+                                error: function() {
+                                    $('#top-products').html('<p class="text-center text-muted">無法取得銷售資料。</p>');
+                                }
+                            });
+                        } else {
+                            renderProducts(data, false);
+                        }
+                    },
+                    error: function() {
+                        $('#top-products').html('<p class="text-center text-muted">無法取得銷售資料。</p>');
+                    }
+                });
+            }
+
+            loadTopProducts(); // 初次載入
+            setInterval(loadTopProducts, 60000); // 每分鐘重新載入一次
+
+            function renderProducts(data, isRandom) {
+                let html = '';
+                data.forEach(function(item, index) {
+                    let formattedPrice = item.price ? `$${formatNumber(item.price)}` : '';
+                    let formattedDiscountedPrice = item.discounted_price ? `$${formatNumber(item.discounted_price)}` : '';
+
+                    html += `
+                        <div class="card product-card shadow-sm">
+                            <a href="/product/detail/${item.id}" class="text-decoration-none">
+                                <div class="product-image-container">
+                                    <img src="{{ asset('storage/images/product') }}/${item.pic}" class="card-img-top product-image" width="300" height="300" alt="${item.title}">
+                                </div>
+                                <div class="card-body product-info">
+                                    <div class="product-title-container">
+                                        <h5 class="product-title mb-1">${item.title}</h5>
+                                        ${item.discount ? `<span class="product-discount-badge">-${item.discount}%</span>` : ''}
+                                    </div>
+                                    <div class="price-container">
+                                        ${formattedPrice ? `<p class="product-price">${formattedPrice}</p>` : ''}
+                                        ${formattedDiscountedPrice ? `<p class="product-discounted-price">${formattedDiscountedPrice}</p>` : ''}
+                                    </div>
+                                    ${item.rating ? `<p class="product-rating">評分：${item.rating}</p>` : ''}
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                });
+                $('#top-products').html(html);
+            }
+        });
+        // 價格千分號顯示
+        function formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+    </script>
+
     @if(session('message'))
         <script>
             toastr.options = {

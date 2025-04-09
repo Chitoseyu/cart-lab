@@ -9,7 +9,18 @@ class Item extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'price', 'pic', 'desc', 'enabled', 'stock'];
+    protected $fillable = [
+        'title',
+        'pic',
+        'desc',
+        'price',
+        'stock',
+        'sell_at',
+        'enabled',
+        'rating',
+        'discount',
+        'discounted_price',
+    ];
 
     public function orders(){
         return $this->belongsToMany(\App\Models\Order::class)->withTimestamps();

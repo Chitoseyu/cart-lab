@@ -21,6 +21,11 @@ Route::get('/', function () {
     return view('home');
 });
 
+// 銷售前三名商品資訊
+Route::get('/top-products', [OrderController::class, 'getTopSellingProducts'])->name('orders.topProducts');
+// 隨機顯示三筆商品資訊
+Route::get('/random-products', [OrderController::class, 'randomProducts'])->name('orders.randomProducts');
+
 Route::group(['prefix' => 'shop'], function () {
     Route::get('/login', [UserController::class, 'login_page'])->name('shop.login_page');
     Route::post('/login', [UserController::class, 'user_login'])->name('shop.login');
@@ -69,11 +74,12 @@ Route::group(['prefix' => 'product'], function () {
 
 Route::group(['prefix' => 'orders'], function () {
     // 未登入權限
-    Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('orders.cartlist');
     Route::post('/cartadd', [ItemController::class, 'addToCart'])->name('orders.cart.add');
 
     // 登入權限
     Route::group(['middleware' => 'user.login'], function () {
+        // 檢視購物車內容
+        Route::get('/cartlist', function () { return view('page.orders.cartlist'); })->name('orders.cartlist');
         // 檢視訂單
         Route::get('/list', [OrderController::class, 'list'])->name('orders.list');
         // 更改訂單狀態

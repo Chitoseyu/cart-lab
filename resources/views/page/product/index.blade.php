@@ -41,6 +41,9 @@
                         價格 {!! request('sort') === 'price' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
                     </a>
                 </th>
+                <th style="width: 5%;">
+                    折扣
+                </th>
                 <th style="width: 10%;">
                     <a href="{{ route('items.index', ['sort' => 'stock', 'order' => request('sort') === 'stock' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
                         庫存 {!! request('sort') === 'stock' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
@@ -74,7 +77,16 @@
                                     style="max-width: 70px; max-height: 70px; object-fit: cover;">
                         @endif
                     </td>
-                    <td>${{ number_format($item->price, 0) }}</td>
+                    <td>
+                        ${{ number_format($item->price, 0) }}
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <span class="badge {{ $item->discount >= 50 ? 'bg-danger' : ($item->discount >= 20 ? 'bg-warning text-dark' : 'bg-success') }}">
+                                {{ $item->discount ? '-'.$item->discount.'%' : '0%' }}
+                            </span>
+                        </div>
+                    </td>
                     <td>
                         <span class="badge bg-primary">{{ $item->stock }}</span>
                     </td>

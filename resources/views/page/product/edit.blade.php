@@ -31,6 +31,20 @@
                     <label for="price" class="form-label">商品價格</label>
                     <input type="number" class="form-control" id="price" name="price" value="{{ old('price', $item->price ?? '') }}" required>
                 </div>
+                <div class="mb-3">
+                    <label for="discount" class="form-label">商品折扣（%）</label>
+                    <input type="range" class="form-range" id="discount" name="discount"
+                        value="{{ old('discount', $item->discount ?? 0) }}"
+                        min="0" max="99" step="1">
+
+                    <div class="text-muted">目前折扣：<span id="discount-value">0%</span></div>
+
+                    <div class="mt-2">
+                        <strong>試算結果：</strong><br>
+                        原價：$<span id="original-price-preview">0</span><br>
+                        折扣後價格：$<span id="discounted-price-preview">0</span>
+                    </div>
+                </div>
 
                 <div class="mb-3">
                     <label for="stock" class="form-label">庫存數量</label>
@@ -87,6 +101,8 @@
 
 <script>
     $(document).ready(function() {
+
+        // 上傳圖片預覽
         $('#pic').change(function() {
             const file = this.files[0];
             if (file) {
@@ -108,6 +124,33 @@
             $('#' + previewId).empty();
             $('#pic').val(''); // 清除檔案輸入欄位的值
         });
+        
+        function updateDiscountPreview() {
+            let price = parseFloat($('#price').val()) || 0;
+            let discount = parseInt($('#discount').val()) || 0;
+            let discountedPrice = Math.round(price * (1 - discount / 100));
+
+            $('#discount-value').text(discount + '%');
+            $('#original-price-preview').text(price);
+            $('#discounted-price-preview').text(discountedPrice);
+        }
+
+        // 初始化顯示
+        updateDiscountPreview();
+
+        // 折扣滑桿變動
+        $('#discount').on('input change', function() {
+            updateDiscountPreview();
+        });
+
+        // 原價輸入時同步更新試算價格
+        $('#price').on('input', function() {
+            updateDiscountPreview();
+        });
+
+      
+           
     });
+    
 </script>
 @endsection

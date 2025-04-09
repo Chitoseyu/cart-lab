@@ -99,7 +99,7 @@
                         @endif
                     </div>
                 </div>
-                @if(Auth::user()->role_id != 1 || Auth::user()->id == $order->user_id)
+                @if(Auth::user()->role_id == 1 || Auth::user()->id == $order->user_id)
                     <button type="button" class="btn btn-outline-danger btn-sm delete-order" data-id="{{ $order->id }}" data-bs-toggle="tooltip" title="刪除訂單">
                         <i class="fas fa-trash-alt"></i>
                     </button>

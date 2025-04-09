@@ -131,6 +131,14 @@ class ItemController extends Controller
             $validated['pic'] = "no_image.png";
         }
 
+        // 若未填 discount，預設為 0
+        if (!isset($validated['discount'])) {
+            $validated['discount'] = 0;
+        }
+
+        // 自動計算 discounted_price
+        $validated['discounted_price'] = round($validated['price'] * (1 - $validated['discount'] / 100));
+
         try {
             $item = Item::create($validated);
             $response = ($item) ? ['type'  => 'success','message' => '商品建立成功！']:['type'  => 'error','message' => '商品建立失敗，請稍後再試。'] ;
@@ -152,6 +160,7 @@ class ItemController extends Controller
             'desc'    => 'nullable|string',
             'enabled' => 'required|boolean',
             'pic'     => 'nullable|image|max:2048',
+            'discount' => 'nullable|integer|min:0|max:99',
         ]);
    
         $item = Item::findOrFail($id);
@@ -171,6 +180,14 @@ class ItemController extends Controller
                 }  
             }
         }
+
+        // 若未填 discount，預設為 0
+        if (!isset($validated['discount'])) {
+            $validated['discount'] = 0;
+        }
+
+        // 自動計算 discounted_price
+        $validated['discounted_price'] = round($validated['price'] * (1 - $validated['discount'] / 100));
 
         $result = $item->update($validated);
 
