@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Item;
+use App\Models\Order;
 
 class ItemController extends Controller
 {
@@ -15,7 +16,32 @@ class ItemController extends Controller
     public function detail($id)
     {
         $product = Item::findOrFail($id);
-        return view('page.product.detail', compact('product')); 
+
+        
+
+        $user = auth()->user();
+
+        $hasPurchased = false;
+        if ($user) {
+            $hasPurchased = $user->orders()
+                ->whereHas('items', function ($q) use ($product) {
+                    $q->where('item_id', $product->id);
+                })->exists();
+    
+            // 查詢使用者是否已經對該商品進行評分
+            $userReview = $product->ratings()->where('user_id', $user->id)->first();
+            if ($userReview && $userReview->comment) {
+                $userReview->comment = htmlspecialchars($userReview->comment, ENT_QUOTES);
+            }
+        } else {
+            $userReview = null;
+        }
+    
+        $reviews = $product->ratings()->latest()->with('user')->get();
+        $averageRating = $product->rating ?? 0;
+
+    
+        return view('page.product.detail', compact('product', 'hasPurchased', 'reviews', 'averageRating', 'userReview'));
     }
     // 加入購物車
     public function addToCart(Request $request)
@@ -87,7 +113,9 @@ class ItemController extends Controller
         $order = $request->get('order', 'desc'); // 預設降序
 
         // 允許的排序欄位
-        $allowedSorts = ['title', 'price', 'stock', 'desc', 'enabled', 'updated_at'];
+        $allowedSorts = ['title', 'price', 'stock', 'desc', 'updated_at'];
+
+        $query->orderBy('enabled', 'desc'); // 第一順位：啟用狀態（啟用排在前面）
 
         if (in_array($sort, $allowedSorts)) {
             $query->orderBy($sort, $order);
@@ -165,6 +193,15 @@ class ItemController extends Controller
    
         $item = Item::findOrFail($id);
 
+        $updateData = []; // 用於儲存要更新的欄位和值
+
+        // 檢查資料是否發生變化
+        foreach ($validated as $key => $value) {
+            if ($item->$key != $value) {
+                $updateData[$key] = $value;
+            }
+        }
+
         // 若有上傳新圖片
         if ($request->hasFile('pic')) {
             $file = $request->file('pic');
@@ -172,13 +209,14 @@ class ItemController extends Controller
             $filename = $format_title . '-' . time() . '.' . $file->getClientOriginalExtension();
             // 將檔案移到 storage/public/images/product
             $file->storeAs('images/product', $filename, 'public');
-            $validated['pic'] = $filename;
+            $updateData['pic'] = $filename;
             // 刪除舊檔案
             if ($item->pic && Storage::disk('public')->exists('images/product/' . $item->pic)) {
                 if($item->pic !== "no_image.png"){
                     Storage::disk('public')->delete('images/product/' . $item->pic);
                 }  
             }
+            $changed = true;
         }
 
         // 若未填 discount，預設為 0
@@ -189,11 +227,27 @@ class ItemController extends Controller
         // 自動計算 discounted_price
         $validated['discounted_price'] = round($validated['price'] * (1 - $validated['discount'] / 100));
 
-        $result = $item->update($validated);
+        // 如果 discounted_price 發生變化，則加入更新資料陣列
+        if ($item->discounted_price != $validated['discounted_price']) {
+            $updateData['discounted_price'] = $validated['discounted_price'];
+        }
 
-        $response = ($result) ? ['type'  => 'success','message' => '商品更新成功！']:['type'  => 'success','message' => '商品更新失敗！'];
-
-
+       // 只有在有欄位需要更新時才執行 update()
+       if (!empty($updateData)) {
+            try {
+                $result = $item->update($updateData);
+                if ($result) {
+                    $response =  ['type' => 'success', 'message' => '商品更新成功！'];
+                } else {
+                    $response =  ['type' => 'error', 'message' => '商品更新失敗！'];
+                }
+            } catch (\Exception $e) {
+                $response = ['type' => 'error', 'message' => '商品更新失敗：']; // $e->getMessage()
+            }
+        } else {
+            // 沒有資料需要更新
+            $response = ['type' => 'success', 'message' => '商品資料未變更！'];
+        }
         
         return redirect()->route('items.index')->with($response);
     }

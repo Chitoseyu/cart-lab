@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RatingController;
+
 use App\Livewire\ShopPage;
 use App\Livewire\CartComponent;
 /*
@@ -68,6 +70,9 @@ Route::group(['prefix' => 'product'], function () {
         // 刪除
         Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy');
         /* 商品管理功能  End */
+
+        // 新增評論
+        Route::post('/review/submit', [RatingController::class, 'store'])->name('items.review.submit');
     });
 
 });

@@ -53,12 +53,23 @@
 }
 
 .product-discount-badge {
-    background-color: #f0ad4e;
-    color: white;
-    padding: 3px 5px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    margin-left: 5px;
+    background:  #f0ad4e;
+    color: #fff;
+    padding: 0.3em 0.6em;
+    border-radius: 3px;
+    font-size: 1rem;
+    margin-left: 0.5em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 針對小螢幕調整樣式 */
+@media (max-width: 768px) {
+    .product-discount-badge {
+        font-size: 0.9rem;
+        padding: 0.3em 0.6em;
+    }
 }
 .price-container {
     display: flex;
@@ -103,7 +114,7 @@
                     type: "GET",
                     dataType: "json",
                     success: function(data) {
-                        if (data.length === 0) {
+                        if (data.length < 3) {
                             $.ajax({
                                 url: "{{ route('orders.randomProducts') }}",
                                 type: "GET",
@@ -132,7 +143,7 @@
                 let html = '';
                 data.forEach(function(item, index) {
                     let formattedPrice = item.price ? `$${formatNumber(item.price)}` : '';
-                    let formattedDiscountedPrice = item.discounted_price ? `$${formatNumber(item.discounted_price)}` : '';
+                    let formattedDiscountedPrice = (item.discounted_price && item.discount > 0) ? `$${formatNumber(item.discounted_price)}` : '';
 
                     html += `
                         <div class="card product-card shadow-sm">
@@ -149,7 +160,9 @@
                                         ${formattedPrice ? `<p class="product-price">${formattedPrice}</p>` : ''}
                                         ${formattedDiscountedPrice ? `<p class="product-discounted-price">${formattedDiscountedPrice}</p>` : ''}
                                     </div>
-                                    ${item.rating ? `<p class="product-rating">評分：${item.rating}</p>` : ''}
+                                    <div class="product-rating">
+                                        ${item.rating ? generateStars(item.rating) : ''}
+                                    </div>
                                 </div>
                             </a>
                         </div>
@@ -161,6 +174,18 @@
         // 價格千分號顯示
         function formatNumber(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        // 評分畫面顯示
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star text-warning"></i>';
+                } else {
+                    stars += '<i class="far fa-star text-warning"></i>';
+                }
+            }
+            return stars;
         }
     </script>
 

@@ -29,7 +29,7 @@
 
                 <div class="mb-3">
                     <label for="price" class="form-label">商品價格</label>
-                    <input type="number" class="form-control" id="price" name="price" value="{{ old('price', $item->price ?? '') }}" required>
+                    <input type="number" class="form-control" id="price" name="price" value="{{ old('price', $item->raw_price ?? '') }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="discount" class="form-label">商品折扣（%）</label>
@@ -126,13 +126,14 @@
         });
         
         function updateDiscountPreview() {
-            let price = parseFloat($('#price').val()) || 0;
+            // 移除千分位符號
+            let price = parseFloat($('#price').val().replace(/,/g, '')) || 0;
             let discount = parseInt($('#discount').val()) || 0;
             let discountedPrice = Math.round(price * (1 - discount / 100));
 
             $('#discount-value').text(discount + '%');
-            $('#original-price-preview').text(price);
-            $('#discounted-price-preview').text(discountedPrice);
+            $('#original-price-preview').text(price.toLocaleString()); // 加上千分位
+            $('#discounted-price-preview').text(discountedPrice.toLocaleString()); // 加上千分位
         }
 
         // 初始化顯示

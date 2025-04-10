@@ -55,9 +55,7 @@
                     </a>
                 </th>
                 <th style="width: 10%;">
-                    <a href="{{ route('items.index', ['sort' => 'enabled', 'order' => request('sort') === 'enabled' && request('order') === 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none">
-                        狀態 {!! request('sort') === 'enabled' ? (request('order') === 'asc' ? '🔼' : '🔽') : '' !!}
-                    </a>
+                    狀態
                 </th>
                 <th style="width: 20%;">修改時間</th>
                 <th style="width: 15%;">操作</th>
@@ -78,7 +76,7 @@
                         @endif
                     </td>
                     <td>
-                        ${{ number_format($item->price, 0) }}
+                        ${{ $item->price }}
                     </td>
                     <td>
                         <div class="d-flex flex-column">

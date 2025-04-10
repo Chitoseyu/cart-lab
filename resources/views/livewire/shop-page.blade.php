@@ -19,14 +19,14 @@
                     </div>
                     <div>
                         @if (session()->has('cart.items.' . $item->id))
-                            <button wire:click="removeCart({{ $item->id }})" class="btn btn-outline-danger btn-sm me-2">移除</button>
+                            <button wire:click="removeCart({{ $item->id }})" class="btn btn-outline-danger btn-sm me-2"><i class="fas fa-cart-arrow-down me-1"></i> 移除</button>
                         @endif
                         @if ($item->stock < 1)
                             <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.6; cursor: not-allowed;">
-                                無庫存
+                             <i class="fas fa-hourglass-half me-1"></i> 補貨中
                             </button>
                         @else
-                            <button wire:click="addCart({{ $item->id }})" class="btn btn-outline-primary btn-sm">加入</button>
+                            <button wire:click="addCart({{ $item->id }})" class="btn btn-outline-primary btn-sm"><i class="fas fa-cart-plus me-1"></i> 加入</button>
                         @endif
                     </div>
                 </li>
