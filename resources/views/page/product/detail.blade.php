@@ -80,7 +80,14 @@
     <!-- 右側商品資訊 -->
     <div class="col-md-6 d-flex flex-column justify-content-between p-4">
         <div>
-            <h1 class="mb-3">{{ $product->title }}</h1>
+            <h1 class="mb-3">
+                {{ $product->title }}
+                @if ($product->discount > 0)
+                    <span class="text-danger me-2 fs-5">
+                        <i class="fas fa-tags me-1"></i>-{{ $product->discount }}%
+                    </span>
+                @endif
+            </h1>
 
             <div class="mb-2">
                 <span class="text-warning fs-5">
@@ -91,11 +98,8 @@
                 <span class="text-muted">({{ $reviews->count() }} 筆評價)</span>
             </div>
 
-            <div class="mb-2 d-flex align-items-center">
+            <div class="mb-3 d-flex align-items-center">
                 @if ($product->discounted_price && $product->discount > 0)
-                    <span class="text-danger me-2">
-                        <i class="fas fa-tags me-1"></i> {{ $product->discount }}%
-                    </span>
                     <span class="text-decoration-line-through text-muted me-2">
                         ${{ $product->price }}
                     </span>
@@ -107,6 +111,18 @@
                         ${{ $product->price }}
                     </span>
                 @endif
+
+                <span class="ms-3">
+                    @if ($product->stock > 0)
+                        <span class="text-secondary fw-bold">
+                            <i class="fas fa-check-circle me-1"></i>庫存：{{ $product->stock }} 件
+                        </span>
+                    @else
+                        <span class="text-danger fw-bold">
+                            <i class="fas fa-ban me-1"></i>已售完
+                        </span>
+                    @endif
+                </span>
             </div>
 
             <p class="text-muted">{{ $product->desc }}</p>

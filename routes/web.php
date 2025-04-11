@@ -79,7 +79,7 @@ Route::group(['prefix' => 'product'], function () {
 
 Route::group(['prefix' => 'orders'], function () {
     // 未登入權限
-    Route::post('/cartadd', [ItemController::class, 'addToCart'])->name('orders.cart.add');
+    Route::post('/cartadd', [OrderController::class, 'addToCart'])->name('orders.cart.add');
 
     // 登入權限
     Route::group(['middleware' => 'user.login'], function () {
@@ -92,9 +92,13 @@ Route::group(['prefix' => 'orders'], function () {
         // 刪除訂單
         Route::delete('/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
         // 直接購買
-        Route::post('/checkout', [ItemController::class, 'directCheckout'])->name('orders.checkout');
+        Route::post('/checkout', [OrderController::class, 'directCheckout'])->name('orders.checkout');
+        // 結帳頁面
+        Route::get('/checkout', [OrderController::class, 'checkoutPage'])->name('orders.check_page');
+        // 送出訂單
+        Route::post('/submit', [OrderController::class, 'addToOrder'])->name('orders.submit');
         // 付款完成
-        Route::get('/payok', [CartComponent::class, 'payOk'])->name('orders.payok');
+        Route::get('/payok', [OrderController::class, 'payOk'])->name('orders.payok');
       
         // Route::post('/bulk-delete', [OrderController::class, 'bulkDelete'])->name('orders.bulkDelete');
      });

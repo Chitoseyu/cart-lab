@@ -107,12 +107,29 @@ class OrderController extends Controller
     public function getTopSellingProducts(Request $request)
     {
         $topProducts = DB::table('item_order')
-            ->join('items', 'item_order.item_id', '=', 'items.id')
-            ->select('items.id', 'items.title', 'items.pic', DB::raw('SUM(item_order.qty) as total_qty'))
-            ->groupBy('items.id', 'items.title', 'items.pic')
-            ->orderByDesc('total_qty')
-            ->limit(3)
-            ->get();
+        ->join('items', 'item_order.item_id', '=', 'items.id')
+        ->select(
+            'items.id',
+            'items.title',
+            'items.pic',
+            'items.price',
+            'items.discount',
+            'items.discounted_price',
+            'items.rating',
+            DB::raw('SUM(item_order.qty) as total_qty')
+        )
+        ->groupBy(
+            'items.id',
+            'items.title',
+            'items.pic',
+            'items.price',
+            'items.discount',
+            'items.discounted_price',
+            'items.rating'
+        )
+        ->orderByDesc('total_qty')
+        ->limit(3)
+        ->get();
 
         return response()->json($topProducts);
     }
@@ -133,6 +150,124 @@ class OrderController extends Controller
         });
 
         return response()->json($products);
+    }
+    // 立即購買
+    public function directCheckout(Request $request)
+    {
+        $orders = session()->get('cart', ['items' => []]);
+        $item = Item::findOrFail($request->input('product_id'));
+
+            if (!isset($orders['items'][$item->id])) {
+            $orders['items'][$item->id] = [
+                'id' => $item->id,
+                'title' => $item->title,
+                'price' => $item->raw_price,
+                'pic' => $item->pic,
+                'qty' => 1,
+            ];
+        }
+        session()->put('cart', $orders);
+
+        
+        return redirect()->route('orders.cartlist');
+    }
+    // 加入購物車
+    public function addToCart(Request $request)
+    {
+        $orders = session()->get('cart', ['items' => []]);
+        $item = Item::findOrFail($request->input('product_id'));
+
+        // 庫存檢查
+        $item_stock = $item->stock;
+        if( $item_stock > 0){
+            if (!isset($orders['items'][$item->id])) {
+                $orders['items'][$item->id] = [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'price' => $item->raw_price,
+                    'pic' => $item->pic,
+                    'qty' => 1,
+                ];
+                $message = "{$item->title} 已加入購物車！";
+            } else {
+                $message = "{$item->title} 已存在購物車！";
+            }
+        }
+        else{
+            $message = "{$item->title} 沒有庫存囉！";
+        }
+
+        session()->put('cart', $orders);
+
+        $response = ['type'  => 'success','message' => $message];
+        
+        return redirect()->back()->with($response);
+    }
+    // 付款成功頁面
+    public function payOk()
+    {
+        return view('page.orders.payok');
+    }
+    // 結帳頁面
+    public function checkoutPage()
+    {
+        if (!session()->has('items') || !session()->has('totalPrice')) {
+            $response = [
+                'type' => 'error',
+                'message' => '找不到結帳資料，請重新操作。',
+            ];      
+            // 重新導向到購物車頁面
+            return redirect()->route('orders.cartlist')->with($response);
+        }
+        // 從 session 中獲取資料
+        $items = session('items');
+        $totalPrice = session('totalPrice');
+
+        return view('page.orders.checkout', compact('items', 'totalPrice'));
+    }
+    // 新增訂單資料
+    public function addToOrder(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'phone' => 'required|string',
+        ]);
+
+
+        // 檢查付款資訊並對應訂單編號儲存
+
+
+        $orderData = session('cart');
+        if (!$orderData || empty($orderData['items'])) {
+            return redirect()->route('orders.cartlist')->withErrors('購物車是空的');
+        }
+
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'total_price' => 0,
+        ]);
+
+        $totalPrice = 0;
+        foreach ($orderData['items'] as $itemData) {
+            $item = Item::find($itemData['id']);
+            if (!$item || $item->stock < $itemData['qty']) continue;
+
+            $order->items()->attach($item->id, [
+                'qty' => $itemData['qty'],
+                'order_price' => $item->raw_price,
+            ]);
+
+            // 減庫存
+            $item->decrement('stock', $itemData['qty']);
+            $totalPrice += $item->raw_price * $itemData['qty'];
+        }
+
+        $order->update(['total_price' => $totalPrice]);
+
+        session()->forget('cart');
+
+        return redirect()->route('orders.payok');
     }
 
 }

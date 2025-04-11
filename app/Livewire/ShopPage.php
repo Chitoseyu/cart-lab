@@ -45,7 +45,7 @@ class ShopPage extends Component
             $orders['items'][$id] = [
                 'id' => $item->id,
                 'title' => $item->title,
-                'price' => $item->price,
+                'price' => $item->raw_price,
                 'pic' => $item->pic,
                 'qty' => 1,
             ];

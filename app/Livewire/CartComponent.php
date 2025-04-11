@@ -15,11 +15,6 @@ class CartComponent extends Component
     {
         return view('livewire.cart-component');
     }
-    // 付款成功頁面
-    public function payOk()
-    {
-        return view('page.orders.payok');
-    }
      // 新增：增加購物車中指定商品的數量
      public function increaseCart($id)
      {
@@ -42,7 +37,7 @@ class CartComponent extends Component
          }
          session()->put('cart', $orders);
      }
-     // 結帳完成並送出訂單
+     // 前往結帳頁面
      public function checkout()
      {
        
@@ -51,11 +46,11 @@ class CartComponent extends Component
             return redirect()->route('shop.login_page')->with($response);
         }
 
-         $orderData = session()->get('cart');
- 
-         if (!$orderData || empty($orderData['items'])) {
-             return; // 若無商品，則不處理
-         }
+        $orderData = session()->get('cart');
+
+        if (!$orderData || empty($orderData['items'])) {
+            return; // 若無商品，則不處理
+        }
  
         $validItems = [];
         $removedItems = [];
@@ -71,7 +66,7 @@ class CartComponent extends Component
             }
     
             if ($item->stock < $itemData['qty']) {
-                $outOfStock[] = $item->title;
+                $outOfStock[] = $item->title." (庫存：".$item->stock.")";
                 continue;
             }
     
@@ -106,34 +101,10 @@ class CartComponent extends Component
             }
             return;
         }
+        return redirect()->route('orders.check_page')->with([
+            'items' => $validItems,
+            'totalPrice' => collect($validItems)->sum(fn($item) => $item['model']->raw_price * $item['qty']),
+        ]);
          
-         // 所有商品都有效，建立新訂單
-         $order = Order::create([
-             'user_id' =>  auth()->id(),
-             'total_price' => 0, // 先預設為0
-         ]);
-         
-         $totalPrice = 0;
-         foreach ($validItems as $data) {
-            $item = $data['model'];
-            $qty = $data['qty'];
-    
-            // 建立訂單項目
-            $order->items()->attach($item->id, [
-                'qty' => $qty,
-                'order_price' => $item->price,
-            ]);
-    
-            // 扣庫存
-            $item->decrement('stock', $qty);
-    
-            $totalPrice += $item->price * $qty;
-        }
-    
-        $order->update(['total_price' => $totalPrice]);
-    
-        session()->forget('cart');
-    
-        return redirect()->route('orders.payok');
      }
 }

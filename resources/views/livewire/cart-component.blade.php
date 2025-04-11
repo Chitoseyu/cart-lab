@@ -8,7 +8,7 @@
         'breadcrumbs' => [
             ['label' => '🏠', 'url' => url('/')],
             ['label' => '商品列表', 'url' => url('/product/list')],
-            ['label' => '訂單明細', 'url' => ''],
+            ['label' => '購物車清單', 'url' => ''],
         ]
     ])
 
@@ -23,7 +23,7 @@
                                 <h6 class="mb-1">{{ $item['title'] }}</h6>
                             </a>
                             <br>
-                            <small class="text-muted">單價: ${{ $item['price'] }}</small>
+                            <small class="text-muted">單價: @price($item['price'])</small>
                         </div>
                     </div>
                     <div>
@@ -32,13 +32,13 @@
                             <span class="mx-2">{{ $item['qty'] }}</span>
                             <button wire:click="increaseCart({{ $item['id'] }})" class="btn btn-outline-success btn-sm">+</button>
                         </div>
-                        <small class="text-muted mt-2">小計: ${{ $item['price'] * $item['qty'] }}</small>
+                        <small class="text-muted mt-2">小計: @price($item['price'] * $item['qty'])</small>
                     </div>
                 </li>
             @endforeach
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <strong>總計:</strong>
-                <span>${{ collect($cart['items'])->sum(fn($item) => $item['price'] * $item['qty']) }}</span>
+                <span>@price(collect($cart['items'])->sum(fn($item) => $item['price'] * $item['qty']))</span>
             </li>
         </ul>
         <div class="d-flex justify-content-between">

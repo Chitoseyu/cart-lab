@@ -43,58 +43,6 @@ class ItemController extends Controller
     
         return view('page.product.detail', compact('product', 'hasPurchased', 'reviews', 'averageRating', 'userReview'));
     }
-    // 加入購物車
-    public function addToCart(Request $request)
-    {
-        $orders = session()->get('cart', ['items' => []]);
-        $item = Item::findOrFail($request->input('product_id'));
-
-        // 庫存檢查
-        $item_stock = $item->stock;
-        if( $item_stock > 0){
-            if (!isset($orders['items'][$item->id])) {
-                $orders['items'][$item->id] = [
-                    'id' => $item->id,
-                    'title' => $item->title,
-                    'price' => $item->price,
-                    'pic' => $item->pic,
-                    'qty' => 1,
-                ];
-                $message = "{$item->title} 已加入購物車！";
-            } else {
-                $message = "{$item->title} 已存在購物車！";
-            }
-        }
-        else{
-            $message = "{$item->title} 沒有庫存囉！";
-        }
-
-        session()->put('cart', $orders);
-
-        $response = ['type'  => 'success','message' => $message];
-        
-        return redirect()->back()->with($response);
-    }
-     // 立即購買
-     public function directCheckout(Request $request)
-     {
-        $orders = session()->get('cart', ['items' => []]);
-        $item = Item::findOrFail($request->input('product_id'));
- 
-         if (!isset($orders['items'][$item->id])) {
-            $orders['items'][$item->id] = [
-                'id' => $item->id,
-                'title' => $item->title,
-                'price' => $item->price,
-                'pic' => $item->pic,
-                'qty' => 1,
-            ];
-        }
-        session()->put('cart', $orders);
- 
-      
-        return redirect()->route('orders.cartlist');
-     }
 
     // 顯示商品管理列表
     public function index(Request $request)

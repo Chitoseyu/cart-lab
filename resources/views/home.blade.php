@@ -161,8 +161,13 @@
                                         ${formattedDiscountedPrice ? `<p class="product-discounted-price">${formattedDiscountedPrice}</p>` : ''}
                                     </div>
                                     <div class="product-rating">
-                                        ${item.rating ? generateStars(item.rating) : ''}
+                                        ${item.rating ? generateStars(item.rating) : generateStars(0)}
                                     </div>
+                                      ${item.total_qty > 0 ? `
+                                        <div class="text-muted mt-2" style="font-size: 0.9rem;">
+                                            銷量 ${item.total_qty}
+                                        </div>` : ''
+                                        }
                                 </div>
                             </a>
                         </div>
