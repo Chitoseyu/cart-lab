@@ -82,14 +82,14 @@
 
                             <div class="mb-3">
                                 <label for="birthday" class="form-label">生日</label>
-                                <input type="date" class="form-control" id="birthday" name="birthday" value="{{ old('birthday', $user->birthday) }}">
+                                <input type="date" class="form-control" id="birthday" name="birthday" value="{{ old('birthday', $user->birthday ? $user->birthday->format('Y-m-d') : '') }}">
                             </div>
 
                             <hr class="my-4">
                             <div class="mb-3 position-relative">
                                 <label for="password" class="form-label">新密碼（留空則不更改）</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control form-control-sm" id="password" name="password" required>
+                                    <input type="password" class="form-control form-control-sm" id="password" name="password">
                                 </div>
                                 <div class="form-text text-muted">密碼至少需為 6 碼</div>
 
@@ -101,7 +101,7 @@
                             <div class="mb-3">
                                 <label for="password_confirmation" class="form-label">確認新密碼</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control form-control-sm" id="password_confirmation" name="password_confirmation" required>
+                                    <input type="password" class="form-control form-control-sm" id="password_confirmation" name="password_confirmation">
                                 </div>
                             </div>
                         </div>

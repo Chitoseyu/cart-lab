@@ -34,6 +34,24 @@ class OrderController extends Controller
         }
     
         $orders = $query->latest()->paginate(10)->appends($request->query());
+
+        // 每個訂單加入對應中文
+        $orders->getCollection()->transform(function ($order) {
+            $methodMap = [
+                'credit_card' => '信用卡',
+                'atm' => 'ATM 轉帳',
+                'cod' => '貨到付款',
+            ];
+            $order->payment_method_label = $methodMap[$order->payment_method] ?? $order->payment_method;
+
+            $deliveryMap = [
+                'delivery' => '宅配',
+                'convenience_store' => '超商取貨',
+            ];
+            $order->delivery_method_label = $deliveryMap[$order->shipping_method] ?? $order->shipping_method;
+
+            return $order;
+        });
     
         return view('page.orders.list', compact('orders'));
     }
@@ -228,24 +246,44 @@ class OrderController extends Controller
     // 新增訂單資料
     public function addToOrder(Request $request)
     {
+
+       // 驗證收貨及付款資訊
         $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'required|string',
-            'phone' => 'required|string',
+            'shipping_name'       => 'required|string|max:255',
+            'shipping_phone'      => 'required|string',
+            'shipping_address'    => 'required|string',
+            // 'shipping_zip_code'   => 'required|string|max:10',
+            // 'shipping_city'       => 'required|string',
+            // 'shipping_district'   => 'required|string',
+            'shipping_method'     => 'required|string',
+            'shipping_fee'        => 'required|numeric',
+            'payment_method'      => 'required|in:credit_card,atm,cod',
         ]);
 
+        // dd($request->input());
+        $orderData = session()->get('cart');
 
-        // 檢查付款資訊並對應訂單編號儲存
-
-
-        $orderData = session('cart');
         if (!$orderData || empty($orderData['items'])) {
             return redirect()->route('orders.cartlist')->withErrors('購物車是空的');
         }
 
+        // 建立訂單 (初始狀態為 1 表示「收到訂單」或「未付款」)
         $order = Order::create([
-            'user_id' => auth()->id(),
-            'total_price' => 0,
+            'user_id'            => auth()->id(),
+
+            'status'             => 1,          // 訂單狀態=收到訂單
+            'payment_method'     => $request->payment_method,
+            'payment_status'     => 0,      // 付款狀態=未付款
+            // 收貨資料
+            'shipping_name'      => $request->shipping_name,
+            'shipping_phone'     => $request->shipping_phone,
+            'shipping_address'   => $request->shipping_address,
+            // 'shipping_zip_code'  => $request->shipping_zip_code,
+            // 'shipping_city'      => $request->shipping_city,
+            // 'shipping_district'  => $request->shipping_district,
+            'shipping_method'    => $request->shipping_method,
+            'shipping_fee'       => $request->shipping_fee,
+            'total_price'        => 0, 
         ]);
 
         $totalPrice = 0;
@@ -260,13 +298,19 @@ class OrderController extends Controller
 
             // 減庫存
             $item->decrement('stock', $itemData['qty']);
+
             $totalPrice += $item->raw_price * $itemData['qty'];
         }
 
-        $order->update(['total_price' => $totalPrice]);
+        // 更新訂單總金額 (加上配送費用)
+        $order->update([
+            'total_price' => $totalPrice + $request->shipping_fee,
+        ]);
 
         session()->forget('cart');
 
+
+        // 依照付款方式選項導向付款頁面或訂單完成頁面
         return redirect()->route('orders.payok');
     }
 
